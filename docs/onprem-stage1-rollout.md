@@ -104,3 +104,5 @@ Common Stage 1 issues:
 - `observability-loki` rendered but no pods: ensure on-prem values use a valid storage/deployment
   profile (single-binary + filesystem in
   `apps/observability/loki/overlays/onprem/values.yaml`).
+- `observability-loki` crash with `compactor.delete-request-store`: disable retention for Stage 1
+  (`loki.compactor.retention_enabled: false`) unless full object-store retention config is in place.
