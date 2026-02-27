@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: smoke-guestbook
+  namespace: argocd
+  labels:
+    hyops.domain: smoke
+    hyops.app: guestbook
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: guestbook
+  source:
+    repoURL: https://github.com/argoproj/argocd-example-apps.git
+    targetRevision: HEAD
+    path: guestbook
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

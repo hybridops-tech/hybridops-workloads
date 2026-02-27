@@ -1,0 +1,12 @@
+# Base values (draft)
+hyops:
+  profile: base
+
+# DocsGPT deployment guidance
+# - Keep it stateless in Kubernetes.
+# - Externalize ALL persistence (DB/vector index) outside the cluster (VM/LXC/managed).
+# - Provide secrets via an existing Secret created by a module/blueprint (do not commit secrets here).
+# - Configure strict CORS to allow only your docs site origin.
+#
+# You must align the values below to the Helm chart you choose.
+# Recommended if you don't have an official DocsGPT chart: use a generic "app template" chart.

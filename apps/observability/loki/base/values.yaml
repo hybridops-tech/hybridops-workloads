@@ -1,0 +1,11 @@
+# Base values (draft)
+hyops:
+  profile: base
+
+# Loki retention (7 days)
+# Note: keys below align with the grafana/loki chart. Adjust if you choose a different chart.
+loki:
+  compactor:
+    retention_enabled: true
+  limits_config:
+    retention_period: 168h

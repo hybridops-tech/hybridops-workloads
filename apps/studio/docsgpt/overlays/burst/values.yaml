@@ -1,0 +1,7 @@
+# Burst/DR overrides (draft)
+hyops:
+  env: burst
+
+# In DR, this app is expected to come back after:
+# - cluster provisioning
+# - external DB restore (standard@v1 PITR) OR external DB replica promote (enterprise@v1)

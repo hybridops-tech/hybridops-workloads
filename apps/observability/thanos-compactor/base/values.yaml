@@ -1,0 +1,34 @@
+# Base values (draft)
+# Chart: bitnami/thanos
+
+hyops:
+  profile: base
+
+# Object storage (GCS)
+# Create a Secret named "thanos-objstore" with key "objstore.yml" containing:
+# type: GCS
+# config:
+#   bucket: "thanos-objstore-hybridops-blueprint"
+#   service_account: |-
+#     { ... }
+existingObjstoreSecret: REPLACE_OBJSTORE_SECRET_NAME
+
+# If you prefer inline config instead of a Secret, use objstoreConfig instead:
+# objstoreConfig: |-
+#   type: GCS
+#   config:
+#     bucket: "thanos-objstore-hybridops-blueprint"
+#     service_account: |-
+#       { ... }
+
+receive:
+  enabled: false
+query:
+  enabled: false
+storegateway:
+  enabled: false
+compactor:
+  enabled: true
+
+minio:
+  enabled: false

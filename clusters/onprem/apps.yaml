@@ -1,0 +1,12 @@
+apps:
+  - platform/keycloak
+  - platform/entitlements-api
+  - platform/velero
+  - observability/kube-prometheus-stack
+  - observability/loki
+  - observability/thanos-compactor
+  - business/nextcloud
+  - business/zammad
+  - education/moodle
+  - academy/website
+  - studio/docsgpt

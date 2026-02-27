@@ -1,0 +1,114 @@
+# Base values (draft)
+hyops:
+  profile: base
+  stateless: true
+  purpose: stripe-webhook-and-entitlements
+  hosts:
+    publicDocs: docs.hybridops.tech
+    learnPortal: learn.hybridops.tech
+    auth: auth.hybridops.tech
+  externalState:
+    postgres:
+      required: true
+      host: REPLACE_EXT_POSTGRES_RW_HOST
+      port: 5432
+      database: hyops_entitlements
+      sslMode: require
+      credentialsSecretRef:
+        name: entitlements-db
+        usernameKey: username
+        passwordKey: password
+    postgresDrReplica:
+      host: REPLACE_EXT_POSTGRES_RO_DR_HOST
+      port: 5432
+      sslMode: require
+
+# The keys below are chart-agnostic placeholders for the app-template/generic chart you choose.
+# Map them to your chart's actual schema before production use.
+image:
+  repository: REPLACE_IMAGE_REPOSITORY
+  tag: REPLACE_IMAGE_TAG
+
+service:
+  port: 8080
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: entitlements.hybridops.tech
+      paths:
+        - path: /
+          pathType: Prefix
+
+# Chart-agnostic reminder: this service is stateless. Map this to your chart's persistence toggle.
+persistence:
+  enabled: false
+
+env:
+  - name: PORT
+    value: "8080"
+  - name: LOG_LEVEL
+    value: info
+  - name: APP_BASE_URL
+    value: https://entitlements.hybridops.tech
+  - name: LEARN_PORTAL_URL
+    value: https://learn.hybridops.tech
+  - name: DOCS_PUBLIC_URL
+    value: https://docs.hybridops.tech
+  - name: OIDC_ISSUER_URL
+    value: https://auth.hybridops.tech/realms/hybridops
+  - name: STRIPE_WEBHOOK_PATH
+    value: /webhooks/stripe
+  - name: DATABASE_HOST
+    value: REPLACE_EXT_POSTGRES_RW_HOST
+  - name: DATABASE_PORT
+    value: "5432"
+  - name: DATABASE_NAME
+    value: hyops_entitlements
+  - name: DATABASE_SSLMODE
+    value: require
+
+# Chart-agnostic secret env placeholders. Map these to your chart's secretKeyRef/envFrom schema.
+secretEnv:
+  - name: DATABASE_USER
+    secretKeyRef:
+      name: entitlements-db
+      key: username
+  - name: DATABASE_PASSWORD
+    secretKeyRef:
+      name: entitlements-db
+      key: password
+  - name: INTERNAL_API_TOKEN
+    secretKeyRef:
+      name: entitlements-app
+      key: INTERNAL_API_TOKEN
+  - name: STRIPE_WEBHOOK_SECRET
+    secretKeyRef:
+      name: stripe-webhook
+      key: STRIPE_WEBHOOK_SECRET
+  - name: STRIPE_SECRET_KEY
+    secretKeyRef:
+      name: stripe-api
+      key: STRIPE_SECRET_KEY
+
+existingSecretRefs:
+  - name: entitlements-db        # db creds (username/password)
+  - name: entitlements-app       # app secret / jwt signing key (if local)
+  - name: stripe-webhook         # STRIPE_WEBHOOK_SECRET
+  - name: stripe-api             # STRIPE_SECRET_KEY
+  - name: oidc-client            # OIDC client secret if needed
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+replicaCount: 2

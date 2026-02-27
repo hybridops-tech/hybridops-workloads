@@ -1,0 +1,18 @@
+# Onprem overrides (draft)
+hyops:
+  env: onprem
+
+# Remote write to Thanos Receive (edge)
+prometheus:
+  prometheusSpec:
+    remoteWrite:
+      - url: "REPLACE_THANOS_RECEIVE_URL"
+        queueConfig:
+          maxShards: 4
+          maxSamplesPerSend: 10000
+
+# Grafana (enabled via kube-prometheus-stack)
+
+# Grafana is centralized on edge
+grafana:
+  enabled: false

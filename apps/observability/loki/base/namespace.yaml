@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: loki
+  labels:
+    hyops.domain: observability
+    hyops.app: loki

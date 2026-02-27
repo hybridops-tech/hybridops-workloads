@@ -1,0 +1,6 @@
+# Onprem overlay values (draft)
+hyops:
+  profile: onprem
+  deploymentTarget: onprem
+
+# Overlay-specific hostnames/secrets can be adjusted here if your chart supports a second values file.

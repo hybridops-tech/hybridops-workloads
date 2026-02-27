@@ -1,0 +1,6 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../apps/smoke/guestbook/overlays/onprem-stage1
+  - ../../apps/platform/velero/overlays/onprem-stage1
+  - ../../apps/observability/loki/overlays/onprem-stage1

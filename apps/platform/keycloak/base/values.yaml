@@ -1,0 +1,18 @@
+# Base values (draft)
+hyops:
+  profile: base
+  externalState:
+    postgres:
+      required: true
+      host: REPLACE_EXT_POSTGRES_RW_HOST
+      port: 5432
+      database: keycloak
+      sslMode: require
+    postgresDrReplica:
+      host: REPLACE_EXT_POSTGRES_RO_DR_HOST
+      port: 5432
+      sslMode: require
+
+# External state contract (anti-drift)
+# Keep Keycloak stateless in-cluster; use external HA PostgreSQL.
+# Map these placeholders to your Helm chart values.

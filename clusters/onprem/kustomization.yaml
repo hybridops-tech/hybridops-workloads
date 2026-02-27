@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../apps/platform/keycloak/overlays/onprem
+  - ../../apps/platform/entitlements-api/overlays/onprem
+  - ../../apps/platform/velero/overlays/onprem
+  - ../../apps/observability/kube-prometheus-stack/overlays/onprem
+  - ../../apps/observability/loki/overlays/onprem
+  - ../../apps/observability/thanos-compactor/overlays/onprem
+  - ../../apps/business/nextcloud/overlays/onprem
+  - ../../apps/business/zammad/overlays/onprem
+  - ../../apps/education/moodle/overlays/onprem
+  - ../../apps/academy/website/overlays/onprem
+  - ../../apps/studio/docsgpt/overlays/onprem

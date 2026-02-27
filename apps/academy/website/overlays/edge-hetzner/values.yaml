@@ -1,0 +1,3 @@
+# Edge-Hetzner overrides (draft)
+hyops:
+  env: edge-hetzner

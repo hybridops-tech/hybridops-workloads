@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: education-moodle
+  namespace: argocd
+  labels:
+    hyops.domain: education
+    hyops.app: moodle
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: moodle
+  sources:
+    - repoURL: REPLACE_CHART_REPO_URL
+      chart: moodle
+      targetRevision: REPLACE_CHART_VERSION
+      helm:
+        valueFiles:
+          - $values/apps/education/moodle/base/values.yaml
+    - repoURL: REPLACE_GIT_REPO_URL
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

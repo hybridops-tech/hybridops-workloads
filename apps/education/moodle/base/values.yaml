@@ -1,0 +1,25 @@
+# Base values (draft)
+hyops:
+  profile: base
+  externalState:
+    postgres:
+      required: true
+      host: REPLACE_EXT_POSTGRES_RW_HOST
+      port: 5432
+      database: moodle
+      sslMode: require
+    postgresDrReplica:
+      host: REPLACE_EXT_POSTGRES_RO_DR_HOST
+      port: 5432
+      sslMode: require
+    objectStorage:
+      required: true
+      provider: REPLACE_AZURE_BLOB_OR_GCS
+      bucket: REPLACE_MOODLEDATA_BUCKET
+      endpoint: REPLACE_IF_NON_DEFAULT
+      credentialsSecretRef:
+        name: moodle-object-storage
+
+# External state contract (anti-drift)
+# Moodle production state must be externalized: PostgreSQL + object storage for moodledata.
+# Map these placeholders to your Helm chart values.

@@ -1,0 +1,13 @@
+# Onprem overrides (draft)
+hyops:
+  env: onprem
+
+# Typical overrides (placeholders)
+# ingress:
+#   enabled: true
+#   hosts:
+#     - chat-api.REPLACE_BASE_DOMAIN
+# resources:
+#   requests:
+#     cpu: 100m
+#     memory: 256Mi

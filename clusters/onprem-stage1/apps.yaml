@@ -1,0 +1,4 @@
+apps:
+  - smoke/guestbook
+  - platform/velero
+  - observability/loki

@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-velero
+  namespace: argocd
+  labels:
+    hyops.domain: platform
+    hyops.app: velero
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: velero
+  sources:
+    - repoURL: REPLACE_CHART_REPO_URL
+      chart: velero
+      targetRevision: REPLACE_CHART_VERSION
+      helm:
+        valueFiles:
+          - $values/apps/platform/velero/base/values.yaml
+    - repoURL: REPLACE_GIT_REPO_URL
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
