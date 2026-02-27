@@ -5,3 +5,8 @@ hyops:
 # Disable CRD upgrade hook job to avoid pulling an invalid kubectl tag
 # from chart defaults in some environments (e.g. 1.34).
 upgradeCRDs: false
+
+# Stage bootstrap profile: deploy controller first, then enable
+# BSL/VSL once provider inputs are wired.
+backupsEnabled: false
+snapshotsEnabled: false

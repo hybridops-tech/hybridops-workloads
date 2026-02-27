@@ -7,6 +7,8 @@ deploymentMode: SingleBinary
 
 singleBinary:
   replicas: 1
+  persistence:
+    enabled: false
 
 read:
   replicas: 0
@@ -32,3 +34,13 @@ loki:
           period: 24h
   storage:
     type: filesystem
+
+# Keep stage1 footprint minimal.
+gateway:
+  enabled: false
+
+chunksCache:
+  enabled: false
+
+resultsCache:
+  enabled: false

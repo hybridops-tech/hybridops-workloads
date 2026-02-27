@@ -98,6 +98,9 @@ Common Stage 1 issues:
 
 - `platform-velero` `Init:ErrImagePull` on `upgrade-crds`: keep `upgradeCRDs: false` in
   `apps/platform/velero/overlays/onprem/values.yaml`.
+- `platform-velero` invalid `BackupStorageLocation`/`VolumeSnapshotLocation`: for Stage 1,
+  keep `backupsEnabled: false` and `snapshotsEnabled: false` until cloud/object-store inputs
+  are configured.
 - `observability-loki` rendered but no pods: ensure on-prem values use a valid storage/deployment
   profile (single-binary + filesystem in
   `apps/observability/loki/overlays/onprem/values.yaml`).
