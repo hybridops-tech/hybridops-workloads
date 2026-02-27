@@ -21,6 +21,8 @@ backend:
 
 loki:
   auth_enabled: false
+  containerSecurityContext:
+    readOnlyRootFilesystem: false
   commonConfig:
     replication_factor: 1
   compactor:
