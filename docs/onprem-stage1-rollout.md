@@ -85,3 +85,19 @@ Promote `onprem-stage1` to the default on-prem path only after:
 - all Stage 1 placeholders are replaced
 - Argo CD Applications report `Synced` and `Healthy`
 - evidence for backup/restore and failure recovery is captured
+
+## Troubleshooting
+
+Use an explicit kubeconfig path (not `KUBEC`):
+
+```bash
+KUBECONFIG="$HOME/.hybridops/envs/dev/state/kubeconfigs/rke2.yaml" kubectl -n argocd get applications
+```
+
+Common Stage 1 issues:
+
+- `platform-velero` `Init:ErrImagePull` on `upgrade-crds`: keep `upgradeCRDs: false` in
+  `apps/platform/velero/overlays/onprem/values.yaml`.
+- `observability-loki` rendered but no pods: ensure on-prem values use a valid storage/deployment
+  profile (single-binary + filesystem in
+  `apps/observability/loki/overlays/onprem/values.yaml`).
