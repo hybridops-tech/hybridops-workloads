@@ -11,6 +11,7 @@ set -euo pipefail
 ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 
 REPO_URL=""
+GIT_REVISION=""
 VELERO_CHART_REPO="https://vmware-tanzu.github.io/helm-charts"
 LOKI_CHART_REPO="https://grafana.github.io/helm-charts"
 VELERO_VERSION=""
@@ -20,6 +21,7 @@ usage() {
   cat <<USAGE
 Usage: scripts/fill-onprem-stage1.sh \\
   --repo-url <git-url> \\
+  --git-revision <git-tag-or-sha> \\
   --velero-version <version> \\
   --loki-version <version> \\
   [--velero-chart-repo <url>] \\
@@ -38,6 +40,10 @@ while [[ $# -gt 0 ]]; do
   case "${1:-}" in
     --repo-url)
       REPO_URL="${2:-}"
+      shift 2
+      ;;
+    --git-revision)
+      GIT_REVISION="${2:-}"
       shift 2
       ;;
     --velero-version)
@@ -68,7 +74,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-if [[ -z "$REPO_URL" || -z "$VELERO_VERSION" || -z "$LOKI_VERSION" ]]; then
+if [[ -z "$REPO_URL" || -z "$GIT_REVISION" || -z "$VELERO_VERSION" || -z "$LOKI_VERSION" ]]; then
   echo "ERR: missing required arguments" >&2
   usage >&2
   exit 2
@@ -97,13 +103,16 @@ replace_placeholder() {
 replace_placeholder "$VELERO_APP" "REPLACE_CHART_REPO_URL" "$VELERO_CHART_REPO"
 replace_placeholder "$VELERO_APP" "REPLACE_CHART_VERSION" "$VELERO_VERSION"
 replace_placeholder "$VELERO_APP" "REPLACE_GIT_REPO_URL" "$REPO_URL"
+replace_placeholder "$VELERO_APP" "REPLACE_GIT_REVISION" "$GIT_REVISION"
 
 replace_placeholder "$LOKI_APP" "REPLACE_CHART_REPO_URL" "$LOKI_CHART_REPO"
 replace_placeholder "$LOKI_APP" "REPLACE_CHART_VERSION" "$LOKI_VERSION"
 replace_placeholder "$LOKI_APP" "REPLACE_GIT_REPO_URL" "$REPO_URL"
+replace_placeholder "$LOKI_APP" "REPLACE_GIT_REVISION" "$GIT_REVISION"
 
 echo "[stage1-fill] substitutions applied"
 echo "  repo_url=$REPO_URL"
+echo "  git_revision=$GIT_REVISION"
 echo "  velero_chart_repo=$VELERO_CHART_REPO"
 echo "  velero_version=$VELERO_VERSION"
 echo "  loki_chart_repo=$LOKI_CHART_REPO"

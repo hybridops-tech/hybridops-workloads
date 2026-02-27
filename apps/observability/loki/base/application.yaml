@@ -19,7 +19,7 @@ spec:
         valueFiles:
           - $values/apps/observability/loki/base/values.yaml
     - repoURL: https://github.com/hybridops-tech/hybridops-workloads.git
-      targetRevision: main
+      targetRevision: v0.1.0-stage1
       ref: values
   syncPolicy:
     automated:

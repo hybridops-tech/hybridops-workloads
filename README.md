@@ -66,6 +66,7 @@ Notes:
 ```bash
 ./scripts/fill-onprem-stage1.sh \
   --repo-url https://github.com/hybridops-tech/hybridops-workloads.git \
+  --git-revision <WORKLOADS_GIT_TAG_OR_SHA> \
   --velero-version <VELERO_CHART_VERSION> \
   --loki-version <LOKI_CHART_VERSION>
 ```

@@ -13,7 +13,7 @@ spec:
     namespace: guestbook
   source:
     repoURL: https://github.com/argoproj/argocd-example-apps.git
-    targetRevision: HEAD
+    targetRevision: 723b86e01bea11dcf72316cb172868fcbf05d69e
     path: guestbook
   syncPolicy:
     automated:
