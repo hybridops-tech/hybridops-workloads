@@ -106,3 +106,5 @@ Common Stage 1 issues:
   `apps/observability/loki/overlays/onprem/values.yaml`).
 - `observability-loki` crash with `compactor.delete-request-store`: disable retention for Stage 1
   (`loki.compactor.retention_enabled: false`) unless full object-store retention config is in place.
+- `observability-loki` crash with `mkdir /var/loki` permission errors: set Stage 1
+  path/storage directories to `/tmp/loki/*` in on-prem overlay values.
