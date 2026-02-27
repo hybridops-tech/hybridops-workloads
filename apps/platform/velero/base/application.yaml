@@ -12,13 +12,13 @@ spec:
     server: https://kubernetes.default.svc
     namespace: velero
   sources:
-    - repoURL: REPLACE_CHART_REPO_URL
+    - repoURL: https://vmware-tanzu.github.io/helm-charts
       chart: velero
-      targetRevision: REPLACE_CHART_VERSION
+      targetRevision: 8.5.0
       helm:
         valueFiles:
           - $values/apps/platform/velero/base/values.yaml
-    - repoURL: REPLACE_GIT_REPO_URL
+    - repoURL: https://github.com/hybridops-tech/hybridops-workloads.git
       targetRevision: main
       ref: values
   syncPolicy:

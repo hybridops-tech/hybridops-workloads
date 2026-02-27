@@ -55,10 +55,19 @@ Notes:
 ./scripts/validate.sh --target onprem-stage1
 ```
 
-- Strict validation (release gate):
+- Strict validation (target-scoped release gate):
 
 ```bash
 ./scripts/validate.sh --strict --target onprem-stage1
+```
+
+## Fast path for Stage 1 placeholders
+
+```bash
+./scripts/fill-onprem-stage1.sh \
+  --repo-url https://github.com/hybridops-tech/hybridops-workloads.git \
+  --velero-version <VELERO_CHART_VERSION> \
+  --loki-version <LOKI_CHART_VERSION>
 ```
 
 ## Repository layout

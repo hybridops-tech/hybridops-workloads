@@ -31,7 +31,7 @@ Checks:
 - no .DS_Store files
 - clusters/<target>/kustomization.yaml resources exist
 - clusters/<target>/apps.yaml matches kustomization resources
-- (strict) no unresolved REPLACE_* placeholders in apps/ and clusters/
+- (strict) no unresolved REPLACE_* placeholders in target cluster + target apps
 USAGE
       exit 0
       ;;
@@ -143,13 +143,19 @@ if ! diff -u "$resources_tmp" "$apps_tmp" >/dev/null; then
   sed 's/^/  - /' "$apps_tmp" >&2
 fi
 
-placeholders="$({ rg -n 'REPLACE_[A-Z0-9_]+' "$ROOT/apps" "$ROOT/clusters" || true; } | awk -F: '$0 !~ /^[^:]+:[0-9]+:[[:space:]]*#/ {print}')"
+scan_paths=("$CLUSTER_DIR")
+while IFS= read -r app_ref; do
+  [[ -n "$app_ref" ]] || continue
+  scan_paths+=("$ROOT/apps/$app_ref")
+done < "$resources_tmp"
+
+placeholders="$({ rg -n 'REPLACE_[A-Z0-9_]+' "${scan_paths[@]}" || true; } | awk -F: '$0 !~ /^[^:]+:[0-9]+:[[:space:]]*#/ {print}')"
 if [[ -n "$placeholders" ]]; then
   if [[ "$STRICT" == "1" ]]; then
-    err "unresolved REPLACE_* placeholders found (strict mode)"
+    err "unresolved REPLACE_* placeholders found in target scope (strict mode)"
     printf '%s\n' "$placeholders" >&2
   else
-    warn "unresolved REPLACE_* placeholders detected (allowed in non-strict mode)"
+    warn "unresolved REPLACE_* placeholders detected in target scope (allowed in non-strict mode)"
   fi
 fi
 

@@ -12,13 +12,13 @@ spec:
     server: https://kubernetes.default.svc
     namespace: loki
   sources:
-    - repoURL: REPLACE_CHART_REPO_URL
+    - repoURL: https://grafana.github.io/helm-charts
       chart: loki
-      targetRevision: REPLACE_CHART_VERSION
+      targetRevision: 6.24.0
       helm:
         valueFiles:
           - $values/apps/observability/loki/base/values.yaml
-    - repoURL: REPLACE_GIT_REPO_URL
+    - repoURL: https://github.com/hybridops-tech/hybridops-workloads.git
       targetRevision: main
       ref: values
   syncPolicy:

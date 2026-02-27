@@ -51,6 +51,19 @@ Recommended chart source baseline:
 - chart: `loki`
 - version: pin a validated release in your environment
 
+## Fast path: fill placeholders with one command
+
+Use the Stage 1 helper script:
+
+```bash
+./scripts/fill-onprem-stage1.sh \
+  --repo-url https://github.com/hybridops-tech/hybridops-workloads.git \
+  --velero-version <VELERO_CHART_VERSION> \
+  --loki-version <LOKI_CHART_VERSION>
+```
+
+This updates Stage 1 placeholders and runs strict target validation.
+
 ## Validation commands
 
 Draft validation (allows unresolved placeholders outside your target):
@@ -59,7 +72,7 @@ Draft validation (allows unresolved placeholders outside your target):
 ./scripts/validate.sh --target onprem-stage1
 ```
 
-Strict validation (fails on unresolved placeholders in `apps/` and `clusters/`):
+Strict validation (target-scoped release gate):
 
 ```bash
 ./scripts/validate.sh --strict --target onprem-stage1
