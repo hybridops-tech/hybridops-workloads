@@ -8,6 +8,8 @@ Files
 - `render-artifacts.sh`
   - Generates DB SQL, Kubernetes Secret manifests, runtime payload Secrets for the app workloads, and a second Argo root `Application`.
   - Default external PostgreSQL host is `10.21.0.2`.
+  - Also generates a shared Keycloak webhook HMAC secret for both `platform-keycloak-secrets` and `platform-entitlements-api-secrets`.
+  - Optional: set `KEYCLOAK_THEME_JAR_PATH=/path/to/hybridops-theme.jar` to generate `20a-secret-keycloak-theme.yaml`.
 - `apply-dev-direct.sh`
   - Dev-only fallback that applies the workloads directly with `kubectl` before the repo changes are pushed.
 - `apply-dev-via-jump.sh`

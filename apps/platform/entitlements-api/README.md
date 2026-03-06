@@ -27,6 +27,7 @@ Required secret
   - `INTERNAL_API_TOKEN`
   - `STRIPE_SECRET_KEY`
   - `STRIPE_WEBHOOK_SECRET`
+  - `KEYCLOAK_EVENTS_SHARED_SECRET` (required when Keycloak event webhook verification is enabled)
 - `platform-entitlements-api-runtime`
   - generated source bundle containing `package.json`, `src/`, and `sql/`
 
@@ -55,6 +56,8 @@ Non-secret config
   - `KEYCLOAK_ADMIN_REALM=hybridops`
   - `KEYCLOAK_ADMIN_CLIENT_ID=hyops-entitlements-api`
   - `KEYCLOAK_MEMBER_ROLE=learn_member`
+  - `KEYCLOAK_EVENTS_WEBHOOK_ENABLED=true`
+  - `KEYCLOAK_EVENTS_HMAC_ALGORITHM=sha256`
 
 Notes
 - This workload deploys only the HTTP API. The optional outbox worker remains off until role sync is needed.

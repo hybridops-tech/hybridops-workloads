@@ -12,13 +12,42 @@ spec:
       labels:
         app.kubernetes.io/name: platform-keycloak
     spec:
+      initContainers:
+        - name: prepare-providers
+          image: curlimages/curl:8.13.0
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
+          args:
+            - |
+              set -eu
+              mkdir -p /providers
+              curl -fsSL "${KEYCLOAK_EVENTS_EXTENSION_JAR_URL}" -o /providers/keycloak-events.jar
+              if [ -f /theme/hybridops-theme.jar ]; then
+                cp /theme/hybridops-theme.jar /providers/hybridops-theme.jar
+              fi
+          envFrom:
+            - configMapRef:
+                name: platform-keycloak-env
+          volumeMounts:
+            - name: providers
+              mountPath: /providers
+            - name: keycloak-theme
+              mountPath: /theme
+              readOnly: true
       containers:
         - name: keycloak
           image: quay.io/keycloak/keycloak:24.0
           imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sh
+            - -c
           args:
-            - start
-            - --import-realm
+            - |
+              set -eu
+              cp /providers/*.jar /opt/keycloak/providers/ 2>/dev/null || true
+              exec /opt/keycloak/bin/kc.sh start
           ports:
             - name: http
               containerPort: 8080
@@ -28,8 +57,8 @@ spec:
             - secretRef:
                 name: platform-keycloak-secrets
           volumeMounts:
-            - name: realm-import
-              mountPath: /opt/keycloak/data/import
+            - name: providers
+              mountPath: /providers
               readOnly: true
           startupProbe:
             httpGet:
@@ -57,6 +86,9 @@ spec:
               cpu: "1"
               memory: 1Gi
       volumes:
-        - name: realm-import
-          configMap:
-            name: platform-keycloak-realm
+        - name: providers
+          emptyDir: {}
+        - name: keycloak-theme
+          secret:
+            secretName: platform-keycloak-theme
+            optional: true

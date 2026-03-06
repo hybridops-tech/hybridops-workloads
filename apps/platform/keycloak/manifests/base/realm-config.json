@@ -3,6 +3,7 @@
   "displayName": "HybridOps",
   "displayNameHtml": "<strong>HybridOps</strong>",
   "enabled": true,
+  "loginTheme": "$(env:KEYCLOAK_LOGIN_THEME)",
   "sslRequired": "external",
   "registrationAllowed": true,
   "registrationEmailAsUsername": true,
@@ -48,7 +49,6 @@
       "attributes": {
         "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "https://learn.hybridops.tech/learn/login",
-        "login_theme": "",
         "client.session.idle.timeout": "0",
         "client.session.max.lifespan": "0"
       },
@@ -95,6 +95,13 @@
   "smtpServer": {},
   "eventsEnabled": true,
   "eventsExpiration": 604800,
+  "eventsListeners": [
+    "jboss-logging",
+    "ext-event-http-sender"
+  ],
+  "attributes": {
+    "_providerConfig.ext-event-http-sender.1": "{\"targetUri\":\"http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak\",\"sharedSecret\":\"$(env:KEYCLOAK_EVENTS_SHARED_SECRET)\",\"hmacAlgorithm\":\"HmacSHA256\",\"retry\":true}"
+  },
   "adminEventsEnabled": true,
   "adminEventsDetailsEnabled": true,
   "internationalizationEnabled": false,

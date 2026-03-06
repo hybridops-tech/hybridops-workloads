@@ -12,10 +12,12 @@ configMapGenerator:
       - KC_PROXY_HEADERS=xforwarded
       - KC_HOSTNAME=auth.hybridops.tech
       - KC_HOSTNAME_STRICT=true
-  - name: platform-keycloak-realm
+      - KEYCLOAK_EVENTS_EXTENSION_JAR_URL=https://repo1.maven.org/maven2/io/phasetwo/keycloak/keycloak-events/0.29/keycloak-events-0.29.jar
+  - name: platform-keycloak-realm-config
     files:
-      - realm.json=realm.json
+      - realm-config.json=realm-config.json
 resources:
   - deployment.yaml
   - service.yaml
   - ingress.yaml
+  - realm-sync-cronjob.yaml

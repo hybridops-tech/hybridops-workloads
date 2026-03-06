@@ -9,7 +9,8 @@ Runtime contract
 - Service: `platform-keycloak`
 - Ingress host: `auth.hybridops.tech`
 - Image: `quay.io/keycloak/keycloak:24.0`
-- Realm import: `manifests/base/realm.json`
+- Declarative realm sync: `adorsys/keycloak-config-cli` (`CronJob`)
+- Realm config source: `manifests/base/realm-config.json`
 
 Required secret
 - `platform-keycloak-secrets`
@@ -18,6 +19,13 @@ Required secret
   - `KC_DB_PASSWORD`
   - `KEYCLOAK_ADMIN`
   - `KEYCLOAK_ADMIN_PASSWORD`
+  - `KEYCLOAK_EVENTS_SHARED_SECRET`
+  - `KEYCLOAK_LOGIN_THEME` (`keycloak` default, set `hybridops` when your Keycloakify jar is installed)
+
+Optional secret
+- `platform-keycloak-theme`
+  - key: `hybridops-theme.jar`
+  - Purpose: mount a Keycloakify-built theme jar without rebuilding the Keycloak image.
 
 Non-secret config
 - `platform-keycloak-env` ConfigMap is generated from manifests and sets:
@@ -28,8 +36,22 @@ Non-secret config
   - `KC_PROXY_HEADERS=xforwarded`
   - `KC_HOSTNAME=auth.hybridops.tech`
   - `KC_HOSTNAME_STRICT=true`
+  - `KEYCLOAK_EVENTS_EXTENSION_JAR_URL=https://repo1.maven.org/maven2/io/phasetwo/keycloak/keycloak-events/0.29/keycloak-events-0.29.jar`
 
 Notes
-- The deployment starts Keycloak with `--import-realm` and mounts `realm.json` into `/opt/keycloak/data/import`.
-- The imported realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
+- The deployment now installs providers during pod init:
+  - `keycloak-events` extension jar (HTTP sender listener)
+  - optional `hybridops-theme.jar` from `platform-keycloak-theme`
+- Realm state is reconciled against `realm-config.json` through the in-cluster config-cli jobs.
+- To force an immediate sync (outside the cron schedule), run:
+  - `kubectl -n keycloak create job --from=cronjob/platform-keycloak-realm-sync platform-keycloak-realm-sync-manual-$(date +%s)`
+- `realm-config.json` enables `ext-event-http-sender` to post signed events to:
+  - `http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak`
+- The realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
 - Keep the Keycloak database outside the cluster so the workload can be rebuilt without losing identity state.
+
+Keycloakify quick path
+- Build a Keycloakify jar in your theme project (`npm run build-keycloak-theme` or your project equivalent).
+- Render artifacts with the jar path:
+  - `KEYCLOAK_THEME_JAR_PATH=/absolute/path/to/hybridops-theme.jar ./tools/onprem-learn-stage1/render-artifacts.sh`
+- Apply the generated secret (`20a-secret-keycloak-theme.yaml`) and restart `platform-keycloak`.

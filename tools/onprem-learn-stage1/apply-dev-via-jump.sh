@@ -49,6 +49,9 @@ kubectl_remote "create namespace entitlements --dry-run=client -o yaml" | kubect
 kubectl_remote "create namespace academy --dry-run=client -o yaml" | kubectl_remote "apply -f -"
 
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/20-secret-keycloak.yaml"
+if [[ -f "${ARTIFACTS_DIR}/20a-secret-keycloak-theme.yaml" ]]; then
+  kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/20a-secret-keycloak-theme.yaml"
+fi
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/21-secret-entitlements.yaml"
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/22-secret-academy.yaml"
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/23-secret-entitlements-runtime.yaml"

@@ -38,6 +38,9 @@ KEYCLOAK_DB_USER="${KEYCLOAK_DB_USER:-keycloak}"
 KEYCLOAK_DB_PASSWORD="${KEYCLOAK_DB_PASSWORD:-$(rand_b64url 24)}"
 KEYCLOAK_ADMIN_USER="${KEYCLOAK_ADMIN_USER:-admin}"
 KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-$(rand_b64url 24)}"
+KEYCLOAK_EVENTS_SHARED_SECRET="${KEYCLOAK_EVENTS_SHARED_SECRET:-$(rand_b64url 32)}"
+KEYCLOAK_LOGIN_THEME="${KEYCLOAK_LOGIN_THEME:-keycloak}"
+KEYCLOAK_THEME_JAR_PATH="${KEYCLOAK_THEME_JAR_PATH:-}"
 
 ENTITLEMENTS_DB_NAME="${ENTITLEMENTS_DB_NAME:-hyops_entitlements}"
 ENTITLEMENTS_DB_USER="${ENTITLEMENTS_DB_USER:-hyops_entitlements}"
@@ -82,6 +85,9 @@ export KEYCLOAK_DB_USER='${KEYCLOAK_DB_USER}'
 export KEYCLOAK_DB_PASSWORD='${KEYCLOAK_DB_PASSWORD}'
 export KEYCLOAK_ADMIN_USER='${KEYCLOAK_ADMIN_USER}'
 export KEYCLOAK_ADMIN_PASSWORD='${KEYCLOAK_ADMIN_PASSWORD}'
+export KEYCLOAK_EVENTS_SHARED_SECRET='${KEYCLOAK_EVENTS_SHARED_SECRET}'
+export KEYCLOAK_LOGIN_THEME='${KEYCLOAK_LOGIN_THEME}'
+export KEYCLOAK_THEME_JAR_PATH='${KEYCLOAK_THEME_JAR_PATH}'
 export KEYCLOAK_DB_URL='${KEYCLOAK_DB_URL}'
 
 export ENTITLEMENTS_DB_NAME='${ENTITLEMENTS_DB_NAME}'
@@ -174,7 +180,27 @@ stringData:
   KC_DB_PASSWORD: "${KEYCLOAK_DB_PASSWORD}"
   KEYCLOAK_ADMIN: "${KEYCLOAK_ADMIN_USER}"
   KEYCLOAK_ADMIN_PASSWORD: "${KEYCLOAK_ADMIN_PASSWORD}"
+  KEYCLOAK_EVENTS_SHARED_SECRET: "${KEYCLOAK_EVENTS_SHARED_SECRET}"
+  KEYCLOAK_LOGIN_THEME: "${KEYCLOAK_LOGIN_THEME}"
 EOF
+
+if [[ -n "${KEYCLOAK_THEME_JAR_PATH}" ]]; then
+  if [[ ! -f "${KEYCLOAK_THEME_JAR_PATH}" ]]; then
+    echo "KEYCLOAK_THEME_JAR_PATH is set but file was not found: ${KEYCLOAK_THEME_JAR_PATH}" >&2
+    exit 1
+  fi
+  KEYCLOAK_THEME_JAR_B64="$(base64 <"${KEYCLOAK_THEME_JAR_PATH}" | tr -d '\n')"
+  cat >"${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml" <<EOF
+apiVersion: v1
+kind: Secret
+metadata:
+  name: platform-keycloak-theme
+  namespace: keycloak
+type: Opaque
+data:
+  hybridops-theme.jar: ${KEYCLOAK_THEME_JAR_B64}
+EOF
+fi
 
 cat >"${OUTPUT_DIR}/21-secret-entitlements.yaml" <<EOF
 apiVersion: v1
@@ -190,6 +216,7 @@ stringData:
   INTERNAL_API_TOKEN: "${ENTITLEMENTS_INTERNAL_API_TOKEN}"
   STRIPE_SECRET_KEY: "${STRIPE_SECRET_KEY}"
   STRIPE_WEBHOOK_SECRET: "${STRIPE_WEBHOOK_SECRET}"
+  KEYCLOAK_EVENTS_SHARED_SECRET: "${KEYCLOAK_EVENTS_SHARED_SECRET}"
 EOF
 
 cat >"${OUTPUT_DIR}/22-secret-academy.yaml" <<EOF
@@ -327,6 +354,7 @@ psql "postgresql://postgres@${DB_HOST}:${DB_PORT}/postgres?sslmode=${DB_SSLMODE}
 
 \`\`\`bash
 kubectl apply -f "${OUTPUT_DIR}/20-secret-keycloak.yaml"
+if [[ -f "${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml" ]]; then kubectl apply -f "${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml"; fi
 kubectl apply -f "${OUTPUT_DIR}/21-secret-entitlements.yaml"
 kubectl apply -f "${OUTPUT_DIR}/22-secret-academy.yaml"
 kubectl apply -f "${OUTPUT_DIR}/23-secret-entitlements-runtime.yaml"

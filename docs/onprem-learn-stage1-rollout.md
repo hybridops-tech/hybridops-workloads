@@ -17,6 +17,8 @@ Required secrets
   - `KC_DB_PASSWORD`
   - `KEYCLOAK_ADMIN`
   - `KEYCLOAK_ADMIN_PASSWORD`
+  - `KEYCLOAK_EVENTS_SHARED_SECRET`
+  - `KEYCLOAK_LOGIN_THEME`
 - `platform-entitlements-api-secrets` in namespace `entitlements`
   - `DATABASE_HOST`
   - `DATABASE_USER`
@@ -24,6 +26,7 @@ Required secrets
   - `INTERNAL_API_TOKEN`
   - `STRIPE_SECRET_KEY`
   - `STRIPE_WEBHOOK_SECRET`
+  - `KEYCLOAK_EVENTS_SHARED_SECRET`
 - `academy-website-secrets` in namespace `academy`
   - `LEARN_SESSION_SECRET`
   - `ENTITLEMENTS_API_TOKEN`
@@ -33,7 +36,7 @@ Required secrets
   - generated runtime payload Secret for the built Astro SSR bundle plus runtime package metadata
 
 Notes
-- Apply `hybridops-docs/control/backend/entitlements-api/sql/001_init.sql` to the external entitlements database before enabling traffic.
+- Apply all SQL migrations in `hybridops-docs/control/backend/entitlements-api/sql/*.sql` to the external entitlements database before enabling traffic.
 - Public/docs/member static surfaces are expected to run on Cloudflare.
 - `learn.hybridops.tech` remains in-cluster for Stage 1 because the current Astro app already uses SSR routes and middleware.
 - Wrangler-backed Cloudflare Worker routes remain the preferred path for HyOps Copilot and other edge logic.
