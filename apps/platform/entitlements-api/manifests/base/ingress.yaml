@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: platform-entitlements-api
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: entitlements.hybridops.tech
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: platform-entitlements-api
+                port:
+                  number: 8080

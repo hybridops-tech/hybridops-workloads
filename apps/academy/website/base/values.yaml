@@ -1,3 +1,2 @@
-# Base values (draft)
-hyops:
-  profile: base
+# Deprecated placeholder file retained for compatibility.
+# The academy website now renders from kustomize manifests under `manifests/`.

@@ -1,0 +1,4 @@
+apps:
+  - platform/keycloak
+  - platform/entitlements-api
+  - academy/website

@@ -1,3 +1,2 @@
-# Onprem overrides (draft)
-hyops:
-  env: onprem
+# Deprecated placeholder file retained for compatibility.
+# The on-prem academy website overlay now renders from kustomize manifests.

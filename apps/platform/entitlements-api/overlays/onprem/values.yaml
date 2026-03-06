@@ -1,6 +1,2 @@
-# Onprem overlay values (draft)
-hyops:
-  profile: onprem
-  deploymentTarget: onprem
-
-# Overlay-specific hostnames/secrets can be adjusted here if your chart supports a second values file.
+# Deprecated placeholder file retained so existing references do not break.
+# The deployable workload now lives under manifests/base and manifests/overlays/*.

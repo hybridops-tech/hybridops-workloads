@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: platform-entitlements-api-env
+data:
+  PORT: "8080"
+  NODE_ENV: production
+  LOG_LEVEL: info
+  DATABASE_NAME: hyops_entitlements
+  DATABASE_PORT: "5432"
+  DATABASE_SSLMODE: require
+  ENTITLEMENT_MEMBER_KEY: learn_member
+  KEYCLOAK_SYNC_ENABLED: "false"
+  KEYCLOAK_ISSUER_URL: https://auth.hybridops.tech/realms/hybridops
+  KEYCLOAK_ADMIN_BASE_URL: https://auth.hybridops.tech
+  KEYCLOAK_ADMIN_REALM: hybridops
+  KEYCLOAK_ADMIN_CLIENT_ID: hyops-entitlements-api
+  KEYCLOAK_MEMBER_ROLE: learn_member
