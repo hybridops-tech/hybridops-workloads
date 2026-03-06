@@ -40,7 +40,7 @@ Hosts
 - `docs.hybridops.tech` (public docs + Copilot)
 
 Clients (initial)
-- `hyops-learn-web` (confidential)
+- `hyops-learn` (public PKCE client for `learn.hybridops.tech`)
 - `hyops-docs` (public or BFF-backed; depends final login UX for docs host)
 - `hyops-entitlements-api` (confidential, optional for service-level calls/introspection)
 

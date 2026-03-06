@@ -1,3 +1,2 @@
-# Edge-Hetzner overrides (draft)
-hyops:
-  env: edge-hetzner
+# Deprecated placeholder file retained so existing references do not break.
+# The deployable workload now lives under manifests/base and manifests/overlays/*.

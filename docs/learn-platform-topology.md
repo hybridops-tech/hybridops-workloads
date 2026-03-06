@@ -29,6 +29,7 @@ Components
 - RKE2 + Argo CD workloads:
   - `platform/keycloak` (OIDC)
   - `platform/entitlements-api` (Stripe webhook + entitlement checks)
+  - `academy/website` (current `learn.hybridops.tech` SSR app)
 - External HA PostgreSQL (already available; use placeholders in workloads until final endpoint is assigned)
 - Stripe (payments)
 - OpenAI API (`gpt-5-nano`) for Copilot synthesis
@@ -66,10 +67,10 @@ Use placeholders until production endpoints are assigned:
 
 ## Argo CD Workloads (Stage 1 Minimum)
 
-Enable in `clusters/onprem/apps.yaml`:
+Enable in the low-cost hybrid target:
 - `platform/keycloak`
 - `platform/entitlements-api`
-- `academy/website` (member/login portal surface as needed)
+- `academy/website` for the current recommended rollout, because the existing Learn app already depends on SSR routes and middleware
 - `studio/docsgpt` (optional only if self-hosting Copilot API; current preferred path is Cloudflare Worker)
 
 ## Anti-Drift Rules

@@ -7,6 +7,6 @@ patches:
       kind: Application
       name: platform-keycloak
     patch: |-
-      - op: add
-        path: /spec/sources/0/helm/valueFiles/-
-        value: $values/apps/platform/keycloak/overlays/edge-hetzner/values.yaml
+      - op: replace
+        path: /spec/source/path
+        value: apps/platform/keycloak/manifests/overlays/edge-hetzner

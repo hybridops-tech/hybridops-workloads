@@ -6,6 +6,7 @@ Targets define Kubernetes topology and rollout maturity.
 
 - `onprem-smoke` (minimal smoke proof)
 - `onprem-stage1` (curated baseline)
+- `onprem-learn-stage1` (learn auth + hosting bundle)
 - `onprem` (full catalog)
 - `burst` (GKE/AKS when provisioned)
 
@@ -13,6 +14,7 @@ Paths:
 
 - `clusters/onprem-smoke`
 - `clusters/onprem-stage1`
+- `clusters/onprem-learn-stage1`
 - `clusters/onprem`
 - `clusters/burst` (optional)
 

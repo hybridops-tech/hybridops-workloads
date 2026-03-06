@@ -1,0 +1,81 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: platform-gitlab-runner
+  namespace: argocd
+  labels:
+    hyops.domain: platform
+    hyops.app: gitlab-runner
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ci
+  source:
+    repoURL: https://charts.gitlab.io
+    chart: gitlab-runner
+    targetRevision: 0.85.0
+    helm:
+      releaseName: platform-gitlab-runner
+      values: |
+        gitlabUrl: https://gitlab.com/
+        concurrent: 4
+        checkInterval: 3
+        logFormat: json
+        replicas: 1
+        rbac:
+          create: true
+          clusterWideAccess: false
+          rules:
+            - apiGroups: [""]
+              resources:
+                - events
+                - pods
+                - pods/attach
+                - pods/exec
+                - pods/log
+                - secrets
+                - serviceaccounts
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+        serviceAccount:
+          create: true
+          name: platform-gitlab-runner
+        metrics:
+          enabled: true
+        runners:
+          secret: platform-gitlab-runner-auth
+          config: |
+            [[runners]]
+              executor = "kubernetes"
+              [runners.kubernetes]
+                namespace = "{{ default .Release.Namespace .Values.runners.jobNamespace }}"
+                image = "alpine:3.20"
+                pull_policy = ["if-not-present"]
+                poll_timeout = 600
+                privileged = false
+                service_account = "platform-gitlab-runner"
+                cpu_request = "250m"
+                memory_request = "256Mi"
+                helper_cpu_request = "100m"
+                helper_memory_request = "128Mi"
+        resources:
+          requests:
+            cpu: 100m
+            memory: 128Mi
+          limits:
+            cpu: 500m
+            memory: 512Mi
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

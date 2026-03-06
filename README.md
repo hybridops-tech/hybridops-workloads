@@ -26,7 +26,7 @@ HYOPS_INPUT_root_destination_namespace=argocd \
 Notes:
 - Prefer tags/commits over `main` for reproducibility.
 - This repo targets Kubernetes workloads only.
-- Edge services run as system services and are managed outside Argo CD.
+- Cloudflare-hosted edge surfaces stay outside Argo CD, but in-cluster edge components such as `cloudflared` can be managed here as Kubernetes workloads.
 
 ## Target maturity
 
@@ -37,6 +37,14 @@ Notes:
   - Status: bootstrap-ready after Stage 1 substitutions
   - Purpose: first curated baseline (`smoke/guestbook`, `platform/velero`, `observability/loki`)
   - Guide: `docs/onprem-stage1-rollout.md`
+- `clusters/onprem-learn-stage1`
+  - Status: ready for Learn auth + hosting integration
+  - Purpose: focused hybrid rollout (`platform/keycloak`, `platform/entitlements-api`, `academy/website`) with Cloudflare-hosted public/docs surfaces and in-cluster Learn SSR
+  - Guide: `docs/onprem-learn-stage1-rollout.md`
+- `clusters/onprem-ci-stage1`
+  - Status: optional bootstrap target once a GitLab runner token exists
+  - Purpose: GitLab runner manager on RKE2 while keeping GitLab itself on GitLab.com
+  - Guide: `docs/onprem-ci-stage1-rollout.md`
 - `clusters/onprem`
   - Status: integration in progress
   - Purpose: full app catalog (requires additional substitutions/integration)
@@ -59,6 +67,14 @@ Notes:
 
 ```bash
 ./scripts/validate.sh --strict --target onprem-stage1
+```
+
+```bash
+./scripts/validate.sh --strict --target onprem-learn-stage1
+```
+
+```bash
+./scripts/validate.sh --strict --target onprem-ci-stage1
 ```
 
 ## Fast path for Stage 1 placeholders
@@ -84,3 +100,5 @@ Notes:
 - `docs/environments.md`
 - `docs/argocd-model.md`
 - `docs/onprem-stage1-rollout.md`
+- `docs/onprem-learn-stage1-rollout.md`
+- `docs/onprem-ci-stage1-rollout.md`

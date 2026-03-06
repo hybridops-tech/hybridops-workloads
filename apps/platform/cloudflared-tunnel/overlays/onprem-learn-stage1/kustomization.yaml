@@ -5,8 +5,8 @@ resources:
 patches:
   - target:
       kind: Application
-      name: academy-website
+      name: platform-cloudflared-tunnel
     patch: |-
       - op: replace
         path: /spec/source/path
-        value: apps/academy/website/manifests/overlays/edge-hetzner
+        value: apps/platform/cloudflared-tunnel/manifests/overlays/onprem
