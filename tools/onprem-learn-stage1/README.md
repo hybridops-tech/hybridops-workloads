@@ -10,6 +10,7 @@ Files
   - Default external PostgreSQL host is `10.21.0.2`.
   - Also generates a shared Keycloak webhook HMAC secret for both `platform-keycloak-secrets` and `platform-entitlements-api-secrets`.
   - Optional: set `KEYCLOAK_THEME_JAR_PATH=/path/to/hybridops-theme.jar` to generate `20a-secret-keycloak-theme.yaml`.
+  - If `apps/platform/keycloak/theme/hybridops-keycloakify/dist_keycloak/hybridops-theme.jar` exists, the renderer auto-detects it and flips `KEYCLOAK_LOGIN_THEME` to `hybridops`.
 - `apply-dev-direct.sh`
   - Dev-only fallback that applies the workloads directly with `kubectl` before the repo changes are pushed.
 - `apply-dev-via-jump.sh`
@@ -26,6 +27,13 @@ Typical flow
 ```bash
 cd hybridops-workloads
 ./tools/onprem-learn-stage1/render-artifacts.sh
+```
+
+Build/update Keycloakify theme before rendering (optional, but recommended when branding/auth UI changed):
+
+```bash
+cd hybridops-workloads/apps/platform/keycloak/theme/hybridops-keycloakify
+./scripts/build-keycloak-theme.sh
 ```
 
 Run the cluster-touching steps from a host that can reach:

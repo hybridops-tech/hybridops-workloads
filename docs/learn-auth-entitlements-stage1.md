@@ -1,21 +1,21 @@
 # Learn Auth and Entitlements (Stage 1, Pre-Moodle)
 
 Purpose
-- Define the minimum self-hosted auth + payments integration required to unlock member docs and HyOps Copilot.
+- Define the minimum self-hosted auth + payments integration required for paid docs, HyOps Copilot, and Academy access.
 - Keep Moodle out of the critical path for the first paid release.
-
-## Scope (Stage 1)
 
 Contract reference
 - `docs/entitlements-api-stage1-contract.md`
 
+## Scope (Stage 1)
 
 In scope
 - Keycloak OIDC login (`auth.hybridops.tech`)
-- Learn portal/member entry (`learn.hybridops.tech`)
+- Learn portal entry (`learn.hybridops.tech`)
 - Stripe checkout + webhooks
 - Entitlements API + external HA PostgreSQL
-- Docs/Copilot tier unlock (`public` vs `learn_member`)
+- Docs/Copilot tiering from explicit entitlements
+- Academy access from explicit bundle or track entitlements
 
 Out of scope (Stage 2)
 - Moodle course delivery and enrollment synchronization
@@ -24,12 +24,31 @@ Out of scope (Stage 2)
 
 - `platform/keycloak` (RKE2): identity provider (OIDC)
 - `platform/entitlements-api` (RKE2): webhook intake + entitlement source of truth
-- External HA PostgreSQL: stores entitlements (and Keycloak DB if you choose)
-- Cloudflare Worker (`docs-chat-worker.js`): reads identity/tier and selects docs corpus + quota
-- Cloudflare static docs hosting: public docs and member docs builds
+- External HA PostgreSQL: stores entitlements and billing-derived access state
+- Cloudflare Worker (`docs-chat-worker.js`): reads identity and entitlement state, then selects docs corpus + quota
+- Cloudflare static docs hosting: public docs build and paid docs build
 - Stripe: payments + subscription lifecycle
 
-## Keycloak Placeholders
+## Stage-1 Access Model
+
+Identity
+- `auth` proves who the user is
+- `entitlement` proves what the user paid for
+
+Canonical entitlement families
+- `docs_paid`, `docs_paid_monthly`, `docs_paid_yearly`
+- `copilot_paid`
+- `academy_all`
+- `academy_track:<slug>`
+- legacy `learn_member` remains supported only as a compatibility Academy bundle key
+
+Runtime rules
+- Paid docs access is derived from `docs_paid*`
+- Paid Copilot access is derived from `copilot_paid` or from docs access if you intentionally bundle them commercially
+- Academy access is derived from `academy_all` or `academy_track:<slug>`
+- Do not treat a generic `member` label as blanket authorization
+
+## Hosts and Clients
 
 Realm
 - `hybridops`
@@ -41,12 +60,13 @@ Hosts
 
 Clients (initial)
 - `hyops-learn` (public PKCE client for `learn.hybridops.tech`)
-- `hyops-docs` (public or BFF-backed; depends final login UX for docs host)
-- `hyops-entitlements-api` (confidential, optional for service-level calls/introspection)
+- `hyops-docs` (public or BFF-backed; depends on final login UX for the docs host)
+- `hyops-entitlements-api` (confidential, optional for service-level calls)
 
 Claims / roles
-- `learn_member` (paid docs + Copilot entitlement)
 - `learn_admin` (staff/admin override)
+- `learn_member` may still be used as the Academy convenience role in the current stage-1 rollout
+- Docs and Copilot should not depend on `learn_member` for authorization
 
 Cookie/session requirement
 - Session/cookie must be usable across subdomains (`Domain=.hybridops.tech`)
@@ -54,40 +74,35 @@ Cookie/session requirement
 
 ## Stripe -> Entitlement Flow
 
-1. User checks out via Stripe from `learn.hybridops.tech`
-2. Stripe webhook hits `platform/entitlements-api` (`/webhooks/stripe`)
-3. Entitlements API upserts subscription/entitlement status in external Postgres
-4. User signs in / refreshes session
-5. Keycloak-issued session/token (or API entitlement lookup) reflects `learn_member`
-6. Docs/Copilot unlocks member corpus + higher quota
+1. User checks out from `learn.hybridops.tech`
+2. Checkout metadata includes `hyops_entitlement_key`
+3. Stripe webhook hits `platform/entitlements-api` (`/webhooks/stripe`)
+4. Entitlements API upserts billing state and the named entitlement in external PostgreSQL
+5. User signs in or refreshes session
+6. Runtime checks derive docs, Copilot, and Academy access from explicit entitlements
 
-## Entitlements Table (Minimal Placeholder)
+Examples
+- Docs monthly -> `docs_paid_monthly`
+- Docs yearly -> `docs_paid_yearly`
+- Academy networking track -> `academy_track:networking-foundations`
+- Academy full bundle -> `academy_all`
+- Separate Copilot add-on -> `copilot_paid`
 
-Suggested logical fields (implementation can vary):
-- `user_id` (stable subject from Keycloak)
-- `entitlement` (`learn_member`)
-- `status` (`active`, `past_due`, `canceled`)
-- `starts_at`
-- `ends_at` (nullable)
-- `source` (`stripe`)
-- `source_ref` (subscription/customer id)
-- `updated_at`
-
-## Worker Integration (Current vs Next)
+## Worker Integration
 
 Current
-- Worker supports `public`/`member` corpus selection (`DOCGPT_PUBLIC_*`, `DOCGPT_MEMBER_*`)
-- Worker supports public quota enforcement and member bypass
-- Worker identity mode is currently a stub (`DOCGPT_AUTH_MODE=none`) with optional trusted-header mode for controlled testing
+- Worker supports separate public and paid docs corpora (`DOCGPT_PUBLIC_*`, `DOCGPT_MEMBER_*`)
+- Worker supports public quota enforcement and paid-tier bypass or higher quota
+- Worker can validate Keycloak JWTs or use Entitlements API summary fallback
 
-Next
-- Validate Keycloak JWT/session in Worker
-- Derive tier from roles/claims (or verified entitlements lookup)
-- Keep backend as source of truth for quota and corpus selection
+Required contract
+- Worker should key off `docs_paid*` using `DOCGPT_DOCS_ENTITLEMENT`
+- `DOCGPT_MEMBER_ENTITLEMENT` remains fallback compatibility only
+- Academy suggestions and Learn CTAs can still be returned separately from docs entitlement checks
 
 ## Anti-Drift Rules
 
 - Do not make paid access depend on frontend-only gating.
-- Do not duplicate docs into the learn portal CMS/app. Keep docs in the docs builds.
-- Do not store authoritative entitlements state in cluster-local PVs.
-- Treat `learn_member` (or successor entitlement) as the single unlock for both member docs and Copilot tier.
+- Do not duplicate docs into the Learn app.
+- Do not store authoritative entitlement state in cluster-local PVs.
+- Do not collapse docs, Copilot, and Academy authorization into one generic `member` flag.

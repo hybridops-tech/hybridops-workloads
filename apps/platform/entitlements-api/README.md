@@ -49,13 +49,20 @@ Non-secret config
   - `DATABASE_NAME=hyops_entitlements`
   - `DATABASE_PORT=5432`
   - `DATABASE_SSLMODE=require`
-  - `ENTITLEMENT_MEMBER_KEY=learn_member`
+  - `ENTITLEMENT_ACADEMY_ALL_KEY=academy_all`
+  - `ENTITLEMENT_LEGACY_ACADEMY_BUNDLE_KEY=learn_member`
+  - `ENTITLEMENT_ACADEMY_TRACK_PREFIX=academy_track:`
+  - `ENTITLEMENT_DOCS_PAID_KEY=docs_paid`
+  - `ENTITLEMENT_DOCS_MONTHLY_KEY=docs_paid_monthly`
+  - `ENTITLEMENT_DOCS_YEARLY_KEY=docs_paid_yearly`
+  - `ENTITLEMENT_COPILOT_PAID_KEY=copilot_paid`
   - `KEYCLOAK_SYNC_ENABLED=false`
   - `KEYCLOAK_ISSUER_URL=https://auth.hybridops.tech/realms/hybridops`
   - `KEYCLOAK_ADMIN_BASE_URL=https://auth.hybridops.tech`
   - `KEYCLOAK_ADMIN_REALM=hybridops`
   - `KEYCLOAK_ADMIN_CLIENT_ID=hyops-entitlements-api`
-  - `KEYCLOAK_MEMBER_ROLE=learn_member`
+  - `KEYCLOAK_ACADEMY_ROLE=learn_member`
+    - Stage-1 compatibility role for Academy claims. Docs and Copilot should key off explicit entitlements, not this role alone.
   - `KEYCLOAK_EVENTS_WEBHOOK_ENABLED=true`
   - `KEYCLOAK_EVENTS_HMAC_ALGORITHM=sha256`
 

@@ -1,14 +1,14 @@
 # Entitlements API Contract (Stage 1, Pre-Moodle)
 
 Purpose
-- Define the minimum Entitlements API required to unlock paid docs access and HyOps Copilot member tiering before Moodle is introduced.
+- Define the minimum Entitlements API required to unlock paid docs access, HyOps Copilot, and Academy track access before Moodle is introduced.
 - Keep implementation aligned to the stateless-cluster + externalized state model.
 
 Scope (Stage 1)
 - Stripe webhook ingestion and idempotent processing
 - Entitlement persistence in external HA PostgreSQL
-- Internal read API for entitlement checks (optional if Worker relies only on Keycloak role claims)
-- Optional Keycloak role synchronization (`learn_member`)
+- Internal read API for entitlement checks
+- Optional Keycloak role synchronization for Academy access only
 
 Out of scope (Stage 1)
 - Moodle enrollment sync (Stage 2)
@@ -16,7 +16,7 @@ Out of scope (Stage 1)
 - Customer support/admin UI
 
 Reference implementation skeleton
-- `/Users/jeleel/Downloads/vsc/hybridops-docs/control/backend/entitlements-api`
+- `hybridops-docs/control/backend/entitlements-api`
 
 ## Architecture Placement
 
@@ -29,34 +29,36 @@ Reference implementation skeleton
 State rule
 - Do not store authoritative entitlement or webhook processing state in cluster-local PVs.
 
-## Trust Boundaries
-
-External callers
-- Stripe -> `POST /webhooks/stripe`
-- (Optionally) Learn portal backend -> internal authenticated endpoints
-
-Internal callers
-- Docs/Copilot Worker (service-to-service) if entitlement lookup is used
-- Keycloak Admin API (outbound) for role sync
-
 ## Canonical Source of Truth
 
-Canonical truth for paid access is the Entitlements DB state (external Postgres).
+Canonical truth for access is the Entitlements DB state in external PostgreSQL.
 
-Keycloak role sync is a delivery mechanism for faster access checks, not the authoritative billing record.
+Keycloak role sync is a delivery mechanism for Academy UX and claims convenience, not the authoritative billing record.
 
 Implication
 - If role sync temporarily fails, the DB still reflects the correct entitlement status.
 - Retry role sync and keep an audit trail.
 
-## Entitlement Model (Minimal)
+## Entitlement Model (Stage 1)
 
-Primary unlock for Stage 1
-- Entitlement key: `learn_member`
+Canonical entitlement families
+- `docs_paid`: generic paid-docs access for manual grants or non-recurring offers
+- `docs_paid_monthly`: monthly paid-docs billing SKU
+- `docs_paid_yearly`: yearly paid-docs billing SKU
+- `copilot_paid`: paid Copilot tier if sold separately
+- `academy_all`: full Academy bundle
+- `academy_track:<slug>`: track-specific Academy access
+
+Legacy compatibility
+- `learn_member` is treated as a legacy Academy bundle key during transition.
+- New docs/Copilot authorization must not depend on `learn_member`.
 
 Expected behavior
-- `learn_member` active => unlock member docs corpus + higher/unlimited Copilot quota
-- `learn_member` inactive => public docs corpus + public Copilot quota
+- Any active `docs_paid*` entitlement => paid docs tier
+- Active `copilot_paid` entitlement => paid Copilot tier
+- Active `academy_all` => full Academy access
+- Active `academy_track:<slug>` => access only to that Academy track
+- Active `learn_member` => legacy Academy bundle compatibility only
 
 ## API Endpoints (Stage 1)
 
@@ -96,11 +98,12 @@ Handled events (minimum)
 - Optional: `invoice.payment_failed`
 
 Behavior
-- Map Stripe customer/subscription to a HyOps subject (`user_id`)
+- Map Stripe customer/subscription to a HybridOps subject (`subject_id`)
 - Upsert subscription status
-- Upsert `learn_member` entitlement state
-- Record webhook event in `stripe_events` table
-- Trigger/queue Keycloak role sync if enabled
+- Read `hyops_entitlement_key` from Stripe metadata
+- Upsert the exact entitlement named by `hyops_entitlement_key`
+- Record webhook event in `stripe_events`
+- Trigger or queue Keycloak role sync if the entitlement affects Academy access
 
 Response (success)
 ```json
@@ -111,7 +114,7 @@ Response (success)
 }
 ```
 
-Response (duplicate/idempotent replay)
+Response (duplicate replay)
 ```json
 {
   "received": true,
@@ -121,15 +124,15 @@ Response (duplicate/idempotent replay)
 }
 ```
 
-### 3) Subject Entitlements (internal, recommended)
+### 3) Subject Entitlements (internal)
 
 `GET /v1/subjects/{subject_id}/entitlements`
 
 Purpose
-- Internal service lookup (Copilot Worker or docs BFF) when claims-only checks are insufficient
+- Internal service lookup for exact entitlement state
 
 Auth
-- Internal service authentication only (mTLS, service JWT, or signed shared secret header; choose one and standardize)
+- Internal service authentication only (`x-internal-token` in the current stage-1 implementation)
 
 Example response
 ```json
@@ -137,36 +140,55 @@ Example response
   "subject_id": "kc:8d4b...",
   "entitlements": [
     {
-      "key": "learn_member",
+      "key": "docs_paid_monthly",
       "status": "active",
       "starts_at": "2026-02-24T00:00:00Z",
-      "ends_at": null
+      "ends_at": null,
+      "updated_at": "2026-02-24T12:00:00Z"
+    },
+    {
+      "key": "academy_track:networking-foundations",
+      "status": "active",
+      "starts_at": "2026-02-24T00:00:00Z",
+      "ends_at": null,
+      "updated_at": "2026-02-24T12:00:00Z"
     }
-  ],
-  "updated_at": "2026-02-24T12:00:00Z"
+  ]
 }
 ```
 
-### 4) Subject Entitlement Summary (internal, optional convenience)
+### 4) Subject Entitlement Summary (internal convenience)
 
 `GET /v1/subjects/{subject_id}/summary`
 
 Purpose
-- Shortcut response for runtime gates (docs/Copilot)
+- Shortcut response for runtime gates in Learn, docs, and Copilot
 
 Example response
 ```json
 {
   "subject_id": "kc:8d4b...",
-  "tier": "member",
-  "copilot_tier": "member",
-  "docs_tier": "member",
-  "entitlements": ["learn_member"],
+  "tier": "academy",
+  "academy_access": true,
+  "academy_all_access": false,
+  "academy_scope": "track",
+  "academy_tracks": ["networking-foundations"],
+  "docs_access": true,
+  "docs_plan": "monthly",
+  "docs_tier": "paid",
+  "copilot_access": false,
+  "copilot_tier": "public",
+  "entitlements": ["academy_track:networking-foundations", "docs_paid_monthly"],
   "source": "db"
 }
 ```
 
-### 5) Admin/Backoffice Reconcile (internal, optional)
+Rules
+- `tier` is an Academy-oriented convenience field and must not be used as the sole docs/Copilot authorization check.
+- Docs gating keys off `docs_access` / `docs_tier`.
+- Copilot gating keys off `copilot_access` / `copilot_tier`, or `docs_access` if your commercial policy intentionally bundles them.
+
+### 5) Admin or Backoffice Reconcile (optional)
 
 `POST /internal/reconcile/subject/{subject_id}`
 
@@ -185,7 +207,7 @@ Represents a stable identity anchor (typically Keycloak `sub`).
 
 Fields (logical)
 - `id` (PK)
-- `subject_id` (unique, e.g. Keycloak `sub`)
+- `subject_id` (unique, for example Keycloak `sub`)
 - `email` (nullable)
 - `provider` (default `keycloak`)
 - `created_at`
@@ -199,7 +221,7 @@ Fields (logical)
 - `subject_id` (FK -> `subjects.subject_id`)
 - `stripe_customer_id`
 - `stripe_subscription_id` (unique, nullable until subscription exists)
-- `status` (`active`, `trialing`, `past_due`, `canceled`, etc.)
+- `status` (`active`, `trialing`, `past_due`, `canceled`, and so on)
 - `current_period_end` (nullable)
 - `raw_last_event_type`
 - `raw_last_event_id`
@@ -207,12 +229,12 @@ Fields (logical)
 - `updated_at`
 
 ### `entitlements`
-Authoritative access state used by docs/Copilot.
+Authoritative access state used by Learn, docs, and Copilot.
 
 Fields (logical)
 - `id` (PK)
 - `subject_id` (FK -> `subjects.subject_id`)
-- `entitlement_key` (e.g. `learn_member`)
+- `entitlement_key` (for example `docs_paid_monthly` or `academy_track:networking-foundations`)
 - `status` (`active`, `inactive`, `revoked`)
 - `source` (`stripe`, `admin`)
 - `source_ref` (subscription/customer id)
@@ -221,7 +243,8 @@ Fields (logical)
 - `updated_at`
 
 Constraints
-- Unique active record strategy per `(subject_id, entitlement_key)` (implementation choice: partial unique index or upsert semantics)
+- Unique record semantics per `(subject_id, entitlement_key)`
+- Webhook processing must be idempotent across replayed events
 
 ### `stripe_events`
 Idempotency and audit for webhook processing.
@@ -235,13 +258,13 @@ Fields (logical)
 - `error_message` (nullable)
 
 ### `sync_outbox` (recommended)
-Queue for Keycloak role sync retries (optional but strongly recommended).
+Queue for Keycloak role sync retries.
 
 Fields (logical)
 - `id` (PK)
 - `subject_id`
 - `operation` (`grant_role`, `revoke_role`)
-- `role_name` (`learn_member`)
+- `role_name` (for example `learn_member` in the current stage-1 rollout)
 - `payload` (JSON)
 - `attempts`
 - `next_attempt_at`
@@ -251,50 +274,62 @@ Fields (logical)
 ## Stripe Event Handling Rules (Stage 1)
 
 Mapping goal
-- Paid active subscription => `learn_member: active`
+- Stripe checkout metadata names the entitlement to grant or revoke.
 
-Recommended mapping (minimal)
+Recommended mapping
 - `checkout.session.completed`
-  - Create/confirm subject linkage (customer <-> subject)
-  - Do not assume final long-lived entitlement without subscription confirmation if checkout is asynchronous
+  - Create or confirm subject linkage (customer <-> subject)
+  - Persist `hyops_entitlement_key` metadata for later subscription events
 - `customer.subscription.created` / `updated`
   - Upsert subscription row
-  - Set `learn_member` active when status is `active` or `trialing` (policy choice)
-  - Set inactive/revoked when status is not entitled
+  - Set the named entitlement active when status is `active` or `trialing`
+  - Set inactive or revoked when status is not entitled
 - `customer.subscription.deleted`
-  - Revoke/inactivate `learn_member`
+  - Revoke or inactivate the named entitlement
+
+Product examples
+- Docs monthly subscription -> `docs_paid_monthly`
+- Docs yearly subscription -> `docs_paid_yearly`
+- Academy full bundle -> `academy_all`
+- Networking track -> `academy_track:networking-foundations`
+- Separate Copilot add-on -> `copilot_paid`
 
 Idempotency
 - Ignore already processed `stripe_events.event_id`
 - Webhooks can be replayed or arrive out of order; current state must be recomputed safely from the latest subscription status
 
-## Keycloak Role Sync (Stage 1, Optional but Recommended)
+## Keycloak Role Sync (Optional, Academy Only)
 
 Goal
-- Mirror DB entitlement `learn_member` into Keycloak role claim for fast docs/Copilot checks
+- Mirror Academy access into one Keycloak role for Learn UX and claims convenience
 
 Behavior
-- `learn_member` becomes active -> ensure Keycloak realm role `learn_member` is granted
-- `learn_member` becomes inactive/revoked -> remove Keycloak role `learn_member`
+- `academy_all` or `academy_track:<slug>` becomes active -> ensure `KEYCLOAK_ACADEMY_ROLE` is granted
+- Academy entitlement becomes inactive or revoked -> remove `KEYCLOAK_ACADEMY_ROLE` when no Academy access remains
+- Legacy `learn_member` continues to map to the same Academy role during migration
 
 Rules
 - DB entitlement state remains canonical
-- Role sync failures do not roll back entitlement DB updates
-- Record failures and retry via outbox/reconcile
+- Role sync failures do not roll back DB updates
+- Docs and Copilot authorization must not depend on the Academy role alone
 
 Inputs (placeholders)
 - Keycloak issuer: `https://auth.hybridops.tech/realms/hybridops`
 - Admin API client credentials supplied via Kubernetes Secret
 
-## Copilot/Docs Integration Contract (Stage 1)
+## Docs and Copilot Integration Contract (Stage 1)
 
-Worker behavior (already partially implemented)
+Worker behavior
 - `public` users -> public docs index + public quota
-- `member` users -> member docs index + member quota bypass/higher quota
+- `paid` docs users -> paid docs index + higher docs quota behavior
+- optional separate `copilot_paid` users -> higher Copilot tier when sold separately
 
-Identity source (current vs target)
+Identity source
 - Current: Worker supports a trusted-header tier mode for controlled internal testing (`x-hyops-tier`, `x-hyops-sub`, `x-hyops-entitlements`)
-- Target: Worker validates Keycloak JWT/session and derives `learn_member` from claims/roles (or verified entitlements lookup)
+- Target: Worker validates Keycloak JWT/session and derives docs access from explicit entitlements or the Entitlements API summary lookup
+
+Contract rule
+- Docs/Copilot code should key off `docs_paid*` and `copilot_paid`, not `learn_member`.
 
 ## Security Requirements
 
@@ -312,24 +347,33 @@ Required
 - `STRIPE_SECRET_KEY` (via Secret)
 - `STRIPE_WEBHOOK_SECRET` (via Secret)
 
+Entitlement model
+- `ENTITLEMENT_ACADEMY_ALL_KEY` (default `academy_all`)
+- `ENTITLEMENT_LEGACY_ACADEMY_BUNDLE_KEY` (default `learn_member`)
+- `ENTITLEMENT_ACADEMY_TRACK_PREFIX` (default `academy_track:`)
+- `ENTITLEMENT_DOCS_PAID_KEY` (default `docs_paid`)
+- `ENTITLEMENT_DOCS_MONTHLY_KEY` (default `docs_paid_monthly`)
+- `ENTITLEMENT_DOCS_YEARLY_KEY` (default `docs_paid_yearly`)
+- `ENTITLEMENT_COPILOT_PAID_KEY` (default `copilot_paid`)
+
 Keycloak sync (if enabled)
-- `KEYCLOAK_ISSUER_URL` (for example `https://auth.hybridops.tech/realms/hybridops`)
+- `KEYCLOAK_ISSUER_URL`
 - `KEYCLOAK_ADMIN_BASE_URL`
 - `KEYCLOAK_ADMIN_REALM`
 - `KEYCLOAK_ADMIN_CLIENT_ID`
 - `KEYCLOAK_ADMIN_CLIENT_SECRET` (via Secret)
-- `KEYCLOAK_MEMBER_ROLE` (default `learn_member`)
+- `KEYCLOAK_ACADEMY_ROLE` (current stage-1 rollout uses `learn_member`)
 
-Portal/docs URLs
+Portal and docs URLs
 - `LEARN_PORTAL_URL`
 - `DOCS_PUBLIC_URL`
-- `DOCS_MEMBER_URL` (if separate host is used)
+- `DOCS_PAID_URL` (if separate paid-docs host is used)
 
 ## Acceptance Criteria (Stage 1)
 
 - Stripe webhook endpoint is signature-verified and idempotent
-- `learn_member` entitlement state is persisted in external Postgres
+- Explicit entitlement keys are persisted in external PostgreSQL
 - Duplicate webhook events do not create duplicate entitlement changes
-- Copilot/docs runtime can determine `public` vs `member` from a single entitlement source (claims or lookup)
-- Keycloak role sync (if enabled) can be retried without corrupting entitlement state
+- Learn, docs, and Copilot can derive access from one entitlement source (claims or lookup)
+- Keycloak role sync, if enabled, mirrors Academy access without becoming the source of truth
 - No authoritative entitlement state depends on cluster-local storage

@@ -1,0 +1,634 @@
+/*
+purpose: HybridOps Keycloak login theme — aligned with hybridops.tech marketing site.
+maintainer: HybridOps
+*/
+
+:root {
+  /* Surfaces — match marketing site tokens */
+  --hyops-bg: #f8fafc;
+  --hyops-bg-subtle: #f1f5f9;
+  --hyops-bg-card: #ffffff;
+  --hyops-border: #e2e8f0;
+  --hyops-border-hov: #cbd5e1;
+
+  /* Input */
+  --hyops-input-bg: #ffffff;
+  --hyops-input-border: #e2e8f0;
+
+  /* Text */
+  --hyops-text: #0f172a;
+  --hyops-text-2: #475569;
+  --hyops-muted: #64748b;
+
+  /* Accent — blue, same as marketing site */
+  --hyops-accent: #2563eb;
+  --hyops-accent-hover: #1d4ed8;
+  --hyops-accent-dim: rgba(37, 99, 235, 0.08);
+  --hyops-accent-contrast: #ffffff;
+
+  /* Feedback */
+  --hyops-danger: #dc2626;
+  --hyops-danger-bg: rgba(220, 38, 38, 0.06);
+  --hyops-danger-border: rgba(220, 38, 38, 0.22);
+  --hyops-success: #166534;
+  --hyops-success-bg: rgba(22, 101, 52, 0.06);
+  --hyops-success-border: rgba(22, 101, 52, 0.22);
+
+  /* Focus */
+  --hyops-focus: rgba(37, 99, 235, 0.28);
+
+  /* Radius — match marketing site */
+  --hyops-radius-card: 12px;
+  --hyops-radius-btn: 10px;
+  --hyops-radius-input: 10px;
+
+  /* Shadows */
+  --hyops-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --hyops-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10), 0 2px 6px rgba(15, 23, 42, 0.06);
+
+  /* Font — stable cross-platform UI stack */
+  --hyops-font: Inter, "Segoe UI", "Helvetica Neue", Arial, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Dev placeholder ────────────────────────── */
+
+.hyops-dev-placeholder {
+  font-family: var(--hyops-font);
+  margin: 48px auto;
+  color: var(--hyops-text);
+  text-align: center;
+}
+
+/* ── Page root ──────────────────────────────── */
+
+html.login-pf,
+html.login-pf body,
+html.login-pf #root {
+  min-height: 100%;
+}
+
+html.login-pf body {
+  margin: 0;
+  font-family: var(--hyops-font);
+  color: var(--hyops-text);
+  background: var(--hyops-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Page layout ────────────────────────────── */
+
+.login-pf-page,
+.kcLoginClass {
+  min-height: 100vh;
+  padding: 48px 16px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background:
+    radial-gradient(900px 420px at 78% 8%, rgba(37, 99, 235, 0.08), transparent 55%),
+    radial-gradient(780px 360px at 12% 72%, rgba(15, 23, 42, 0.03), transparent 60%);
+}
+
+/* ── Header / brand ─────────────────────────── */
+
+#kc-header,
+.card-pf,
+.kcFormCardClass {
+  width: min(100%, 420px);
+}
+
+#kc-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+#kc-header-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--hyops-text);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+#kc-header-wrapper::before {
+  content: "H";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: var(--hyops-accent-dim);
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  color: var(--hyops-accent);
+  font-weight: 600;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+/* ── Card ───────────────────────────────────── */
+
+.card-pf,
+.kcFormCardClass {
+  border-radius: var(--hyops-radius-card);
+  border: 1px solid var(--hyops-border);
+  background: var(--hyops-bg-card);
+  box-shadow: var(--hyops-shadow-md);
+  padding: 28px 28px 24px;
+}
+
+/* ── Page title ─────────────────────────────── */
+
+.login-pf-header,
+.kcFormHeaderClass {
+  margin: 0 0 20px;
+}
+
+#kc-page-title {
+  margin: 0;
+  color: var(--hyops-text);
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* ── Form layout ────────────────────────────── */
+
+#kc-content-wrapper {
+  display: grid;
+  gap: 0;
+}
+
+#kc-content-wrapper>.col-md-10,
+#kc-content-wrapper>.col-xs-12 {
+  width: 100%;
+}
+
+#kc-form,
+#kc-form-wrapper,
+#kc-form-login,
+#kc-register-form {
+  margin: 0;
+}
+
+.form-horizontal,
+.kcFormClass {
+  margin: 0;
+}
+
+.form-group,
+.kcFormGroupClass {
+  margin: 0 0 16px;
+}
+
+/* ── Labels ─────────────────────────────────── */
+
+#kc-content-wrapper label,
+.pf-c-form__label,
+.pf-c-form__label-text,
+.kcLabelClass,
+.login-pf label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--hyops-text-2);
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* keep semantic labels for accessibility while using placeholders visually */
+.hyops-sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.hyops-hidden {
+  display: none !important;
+}
+
+.hyops-inline-field .kcLabelWrapperClass,
+.hyops-inline-field .kcLabelClass {
+  display: none !important;
+}
+
+.kcLabelWrapperClass.subtitle {
+  display: none !important;
+}
+
+/* ── Inputs ─────────────────────────────────── */
+
+.pf-c-form-control,
+.kcInputClass,
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+textarea,
+select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: var(--hyops-radius-input);
+  border: 1px solid var(--hyops-input-border);
+  background: var(--hyops-input-bg);
+  color: var(--hyops-text);
+  outline: none;
+  font-family: var(--hyops-font);
+  font-size: 14px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+textarea {
+  min-height: 92px;
+  padding: 10px 12px;
+  resize: vertical;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--hyops-muted);
+  opacity: 0.9;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  box-shadow: 0 0 0 1000px var(--hyops-input-bg) inset;
+  -webkit-text-fill-color: var(--hyops-text);
+}
+
+.pf-c-form-control:focus,
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--hyops-accent);
+  box-shadow: 0 0 0 3px var(--hyops-focus);
+}
+
+/* ── Input group (password toggle) ──────────── */
+
+.pf-c-input-group,
+.kcInputGroup {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.pf-c-input-group>.pf-c-form-control,
+.pf-c-input-group>input,
+.kcInputGroup>.kcInputClass,
+.kcInputGroup>input {
+  flex: 1 1 auto;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.pf-c-button.pf-m-control,
+.kcFormPasswordVisibilityButtonClass {
+  min-width: 46px;
+  height: auto;
+  padding: 0 10px;
+  border-radius: 0 var(--hyops-radius-input) var(--hyops-radius-input) 0;
+  border: 1px solid var(--hyops-input-border);
+  background: linear-gradient(180deg, #ffffff, var(--hyops-bg-subtle));
+  color: var(--hyops-text-2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.pf-c-button.pf-m-control:hover,
+.kcFormPasswordVisibilityButtonClass:hover {
+  background: linear-gradient(180deg, #f8fbff, #eef2ff);
+  color: var(--hyops-accent);
+}
+
+/* ── Show/hide password icons ───────────────── */
+
+.kcFormPasswordVisibilityIconShow,
+.kcFormPasswordVisibilityIconHide {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  color: inherit;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 18px 18px;
+  mask-size: 18px 18px;
+  font-size: 0;
+  line-height: 0;
+}
+
+.kcFormPasswordVisibilityIconShow {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M3%203l18%2018'/%3E%3Cpath%20d='M10.6%2010.6A2.5%202.5%200%200%200%2014%2014'/%3E%3Cpath%20d='M9.2%205.7A11.5%2011.5%200%200%201%2012%206c6.5%200%2010%206%2010%206a18%2018%200%200%201-3.2%203.8'/%3E%3Cpath%20d='M6.1%208.2C4.2%209.7%203%2012%203%2012s3.5%206%209%206a9.8%209.8%200%200%200%204.1-.9'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M3%203l18%2018'/%3E%3Cpath%20d='M10.6%2010.6A2.5%202.5%200%200%200%2014%2014'/%3E%3Cpath%20d='M9.2%205.7A11.5%2011.5%200%200%201%2012%206c6.5%200%2010%206%2010%206a18%2018%200%200%201-3.2%203.8'/%3E%3Cpath%20d='M6.1%208.2C4.2%209.7%203%2012%203%2012s3.5%206%209%206a9.8%209.8%200%200%200%204.1-.9'/%3E%3C/svg%3E");
+}
+
+.kcFormPasswordVisibilityIconHide {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%2012s3.5-6%2010-6%2010%206%2010%206-3.5%206-10%206-10-6-10-6z'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='2.5'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Cpath%20d='M2%2012s3.5-6%2010-6%2010%206%2010%206-3.5%206-10%206-10-6-10-6z'/%3E%3Ccircle%20cx='12'%20cy='12'%20r='2.5'/%3E%3C/svg%3E");
+}
+
+/* ── Form options (remember me, forgot pw) ──── */
+
+#kc-form-options,
+.login-pf-settings,
+.kcFormSettingClass,
+.kcFormOptionsClass {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+#kc-form-options {
+  margin-top: 0;
+}
+
+.kcFormOptionsWrapperClass {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.kcFormOptionsWrapperClass span {
+  display: inline-flex;
+  align-items: center;
+}
+
+.kcFormOptionsWrapperClass a {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+/* Register page: place "Back to Login" below the Register button */
+#kc-register-form .kcFormGroupClass:last-child {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+#kc-register-form #kc-form-buttons {
+  order: 1;
+  margin-top: 0;
+}
+
+#kc-register-form #kc-form-options {
+  order: 2;
+  margin-top: 10px;
+  justify-content: center;
+}
+
+/* ── Primary button ─────────────────────────── */
+
+#kc-form-buttons {
+  margin-top: 8px;
+}
+
+.pf-c-button.pf-m-primary,
+.kcButtonClass.kcButtonPrimaryClass,
+.kcButtonPrimaryClass,
+.btn-primary,
+#kc-form-buttons input[type="submit"],
+#kc-form-buttons button[type="submit"],
+#kc-login {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid var(--hyops-accent);
+  border-radius: var(--hyops-radius-btn);
+  background: var(--hyops-accent);
+  color: var(--hyops-accent-contrast);
+  font-family: var(--hyops-font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+.pf-c-button.pf-m-primary:hover,
+.kcButtonClass.kcButtonPrimaryClass:hover,
+.kcButtonPrimaryClass:hover,
+.btn-primary:hover,
+#kc-form-buttons input[type="submit"]:hover,
+#kc-form-buttons button[type="submit"]:hover,
+#kc-login:hover {
+  background: var(--hyops-accent-hover);
+  border-color: var(--hyops-accent-hover);
+}
+
+.pf-c-button.pf-m-primary:disabled,
+.kcButtonClass.kcButtonPrimaryClass:disabled,
+.kcButtonPrimaryClass:disabled,
+#kc-form-buttons input[type="submit"]:disabled,
+#kc-form-buttons button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Link buttons ───────────────────────────── */
+
+.pf-c-button.pf-m-link,
+.pf-c-button.pf-m-inline {
+  background: transparent;
+  border: 0;
+  color: var(--hyops-accent);
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+}
+
+a {
+  color: var(--hyops-accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ── Checkboxes / radios ────────────────────── */
+
+.checkbox label,
+.pf-c-check,
+.pf-c-radio,
+.kcInputClassCheckbox,
+.kcInputClassRadio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--hyops-text-2);
+  font-size: 14px;
+}
+
+#kc-form-options .checkbox {
+  margin: 0;
+}
+
+#kc-form-options .checkbox label,
+#kc-form-options label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 !important;
+  color: var(--hyops-text-2);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.15;
+}
+
+input[type="checkbox"],
+input[type="radio"],
+.pf-c-check__input,
+.pf-c-radio__input,
+.kcCheckInputClass,
+.kcCheckboxInputClass,
+.kcInputClassCheckboxInput,
+.kcInputClassRadioInput {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--hyops-accent);
+}
+
+#kc-form-options input[type="checkbox"],
+#kc-form-options .kcCheckInputClass,
+#kc-form-options .kcCheckboxInputClass,
+#kc-form-options .kcInputClassCheckboxInput {
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  flex: 0 0 14px;
+  vertical-align: middle;
+}
+
+/* ── Info block (registration link) ─────────── */
+
+#kc-info {
+  margin-top: 20px;
+}
+
+#kc-info-wrapper {
+  border-top: 1px solid var(--hyops-border);
+  padding: 14px 0 0;
+  color: var(--hyops-text-2);
+  font-size: 14px;
+  text-align: center;
+}
+
+#kc-registration-container,
+#kc-registration,
+#kc-registration span {
+  color: var(--hyops-text-2);
+}
+
+/* ── Alerts ─────────────────────────────────── */
+
+.pf-c-alert,
+.kcAlertClass {
+  border-radius: var(--hyops-radius-input);
+  border: 1px solid var(--hyops-border);
+  background: var(--hyops-bg-subtle);
+  color: var(--hyops-text);
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.pf-c-alert.pf-m-danger,
+.kcAlertClass.pf-m-danger,
+.alert-error {
+  border-color: var(--hyops-danger-border);
+  background: var(--hyops-danger-bg);
+  color: var(--hyops-danger);
+}
+
+.pf-c-alert.pf-m-success,
+.kcAlertClass.pf-m-success,
+.alert-success {
+  border-color: var(--hyops-success-border);
+  background: var(--hyops-success-bg);
+  color: var(--hyops-success);
+}
+
+.pf-c-alert__icon {
+  display: none;
+}
+
+/* ── Error text ─────────────────────────────── */
+
+.kc-feedback-text,
+.pf-c-form__helper-text.pf-m-error,
+.kcInputErrorMessageClass,
+.kcAlertTitleClass {
+  color: var(--hyops-danger);
+  font-size: 13px;
+  line-height: 1.45;
+  margin-top: 4px;
+}
+
+/* ── Misc ───────────────────────────────────── */
+
+.subtitle,
+.required {
+  color: var(--hyops-muted);
+}
+
+.required {
+  color: var(--hyops-danger);
+}
+
+.g-recaptcha {
+  margin-top: 8px;
+}
+
+/* ── Responsive ─────────────────────────────── */
+
+@media (max-width: 560px) {
+  .login-pf-page,
+  .kcLoginClass {
+    padding-top: 24px;
+    padding-bottom: 32px;
+  }
+
+  .card-pf,
+  .kcFormCardClass {
+    padding: 20px 18px 18px;
+  }
+
+  #kc-page-title {
+    font-size: 22px;
+  }
+}

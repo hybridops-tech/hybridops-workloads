@@ -9,37 +9,51 @@ Purpose
 - Kubernetes clusters are disposable execution planes.
 - Authoritative state is externalized.
 - External HA PostgreSQL is the DB system of record for auth, entitlements, and later Moodle DB.
-- Moodle file storage (`moodledata`) must be external object storage (Azure Blob or GCS) before production use.
+- Moodle file storage (`moodledata`) must be external object storage before production use.
 
 ## Hostnames (Target)
 
-- `docs.hybridops.tech`: public docs + HyOps Copilot (preview for anonymous users)
-- `learn.hybridops.tech`: member login/payment portal first, Moodle later
-- `learn-docs.hybridops.tech` (or equivalent member docs path/host): richer/member docs build (current `academy` docs build)
-- `auth.hybridops.tech` (recommended): Keycloak
+- `docs.hybridops.tech`: public docs + HyOps Copilot
+- `learn.hybridops.tech`: Learn portal, login, pricing, Academy access UX
+- `learn-docs.hybridops.tech` (or equivalent paid path/host): richer paid docs build if you keep it separate from public docs
+- `auth.hybridops.tech`: Keycloak
 
 ## Stage 1 (No Moodle Required)
 
 Goal
-- Ship paid docs + HyOps Copilot access before Moodle exists.
+- Ship paid docs, HyOps Copilot, and Academy access before Moodle exists.
 
 Components
-- Cloudflare static hosting: public docs build and member docs build
+- Cloudflare static hosting: public docs build and paid docs build
 - Cloudflare Worker: HyOps Copilot API (`/api/docs-chat`)
 - RKE2 + Argo CD workloads:
   - `platform/keycloak` (OIDC)
   - `platform/entitlements-api` (Stripe webhook + entitlement checks)
-  - `academy/website` (current `learn.hybridops.tech` SSR app)
-- External HA PostgreSQL (already available; use placeholders in workloads until final endpoint is assigned)
-- Stripe (payments)
+  - `academy/website` (`learn.hybridops.tech` SSR app)
+- External HA PostgreSQL
+- Stripe
 - OpenAI API (`gpt-5-nano`) for Copilot synthesis
 
 User flow
 1. Anonymous user accesses `docs.hybridops.tech`
-2. Copilot/docs preview gate prompts sign-in / join Learn
-3. User signs in and pays via `learn.hybridops.tech`
-4. Stripe webhook updates entitlements
-5. Same identity unlocks member docs + higher Copilot quota
+2. Copilot/docs preview gate prompts sign-in or join Learn
+3. User signs in and purchases a specific offer via `learn.hybridops.tech`
+4. Stripe webhook updates explicit entitlement rows
+5. Same identity receives only the capabilities granted by those entitlements
+
+## Stage-1 Access Rules
+
+Authorization is capability-based.
+
+- Paid docs access: `docs_paid`, `docs_paid_monthly`, or `docs_paid_yearly`
+- Paid Copilot access: `copilot_paid` if sold separately, or the same docs entitlement if you intentionally bundle them
+- Academy full access: `academy_all`
+- Academy track access: `academy_track:<slug>`
+- Legacy compatibility only: `learn_member` as temporary Academy bundle fallback
+
+Contract rule
+- Being authenticated does not imply being entitled.
+- Being “a member” is marketing language, not the runtime authorization model.
 
 ## Stage 2 (Moodle Added)
 
@@ -48,54 +62,46 @@ Goal
 
 Additions
 - `education/moodle` workload in RKE2
-- External object storage for `moodledata` (Azure Blob or GCS)
+- External object storage for `moodledata`
 - Same Keycloak OIDC provider
-- Same entitlements source of truth
+- Same Entitlements API as the source of truth
 
 Notes
 - Moodle is not the docs renderer; docs remain on MkDocs/Cloudflare.
-- Moodle links to docs pages and docs can link back to course modules.
-
-## External State Placeholders (Stage 1)
-
-Use placeholders until production endpoints are assigned:
-
-- RW Postgres endpoint: `REPLACE_EXT_POSTGRES_RW_HOST`
-- RO/DR Postgres endpoint: `REPLACE_EXT_POSTGRES_RO_DR_HOST`
-- DB port: `5432`
-- TLS/SSL mode: `require`
+- Moodle enrollment should be driven from explicit Academy entitlements, not a generic member role.
 
 ## Argo CD Workloads (Stage 1 Minimum)
 
 Enable in the low-cost hybrid target:
 - `platform/keycloak`
 - `platform/entitlements-api`
-- `academy/website` for the current recommended rollout, because the existing Learn app already depends on SSR routes and middleware
-- `studio/docsgpt` (optional only if self-hosting Copilot API; current preferred path is Cloudflare Worker)
+- `academy/website`
+- `studio/docsgpt` only if you later choose a self-hosted Copilot API instead of the Cloudflare Worker
 
 ## Anti-Drift Rules
 
-- Do not add cluster-local databases for auth/entitlements/Moodle production data.
+- Do not add cluster-local databases for auth, entitlements, or Moodle production data.
 - Do not make Copilot access control frontend-only; backend entitlement checks remain source of truth.
 - Do not duplicate technical docs into Moodle; link to the docs site.
-- Keep public and member docs indexes separate for Copilot retrieval.
+- Keep public and paid docs indexes separate for Copilot retrieval.
 
-## Stage 1 Identity and Entitlements (Detailed Placeholder Plan)
+## Stage-1 Identity and Entitlements
 
-Identity provider (self-hosted)
+Identity provider
 - Reuse `platform/keycloak` before introducing another IdP.
 - Keycloak realm placeholder: `hybridops`.
 - Preferred host: `auth.hybridops.tech`.
 
 Entitlements authority
 - `platform/entitlements-api` stores and serves entitlement state backed by external HA PostgreSQL.
-- Stripe webhooks update entitlement rows (for example `learn_member` active/inactive).
-- Copilot and member docs access checks should read the same entitlement source (directly or via signed claims issued after login).
+- Stripe webhooks update explicit entitlement rows.
+- Learn, docs, and Copilot should read the same entitlement source directly or through validated claims.
 
 Copilot corpus/limit behavior
 - Anonymous users -> public docs index + public quota.
-- Paid users (`learn_member`) -> member docs index + higher/unlimited quota.
+- Paid docs users -> paid docs index + paid quota policy.
+- Academy access should influence Academy CTAs and module links, not public docs authorization by itself.
 
 Implementation note
-- The Worker already supports public/member index selection and a temporary trusted-header tier mode.
+- The Worker already supports public/paid corpus selection and a temporary trusted-header tier mode.
 - Replace the trusted-header stub with Keycloak JWT/session validation before public paid rollout.

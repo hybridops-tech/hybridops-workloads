@@ -50,7 +50,9 @@ kubectl_remote "create namespace academy --dry-run=client -o yaml" | kubectl_rem
 
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/20-secret-keycloak.yaml"
 if [[ -f "${ARTIFACTS_DIR}/20a-secret-keycloak-theme.yaml" ]]; then
-  kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/20a-secret-keycloak-theme.yaml"
+  # Avoid "RequestEntityTooLarge" from apply last-applied annotation duplication on large theme jars.
+  kubectl_remote "-n keycloak delete secret platform-keycloak-theme --ignore-not-found"
+  kubectl_remote "create -f -" < "${ARTIFACTS_DIR}/20a-secret-keycloak-theme.yaml"
 fi
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/21-secret-entitlements.yaml"
 kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/22-secret-academy.yaml"
@@ -60,6 +62,13 @@ kubectl_remote "apply -f -" < "${ARTIFACTS_DIR}/24-secret-academy-runtime.yaml"
 kubectl kustomize "${ROOT_DIR}/apps/platform/keycloak/manifests/overlays/onprem" | kubectl_remote "-n keycloak apply -f -"
 kubectl kustomize "${ROOT_DIR}/apps/platform/entitlements-api/manifests/overlays/onprem" | kubectl_remote "-n entitlements apply -f -"
 kubectl kustomize "${ROOT_DIR}/apps/academy/website/manifests/overlays/onprem" | kubectl_remote "apply -f -"
+
+kubectl_remote "-n keycloak rollout restart deployment/platform-keycloak"
+kubectl_remote "-n keycloak rollout status deployment/platform-keycloak --timeout=300s"
+kubectl_remote "-n entitlements rollout restart deployment/platform-entitlements-api"
+kubectl_remote "-n entitlements rollout status deployment/platform-entitlements-api --timeout=300s"
+kubectl_remote "-n academy rollout restart deployment/academy-website"
+kubectl_remote "-n academy rollout status deployment/academy-website --timeout=300s"
 
 if [[ -f "${ARTIFACTS_DIR}/25-secret-cloudflared-tunnel.yaml" ]]; then
   kubectl_remote "create namespace cloudflare-tunnel --dry-run=client -o yaml" | kubectl_remote "apply -f -"

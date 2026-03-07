@@ -47,11 +47,15 @@ Notes
   - `kubectl -n keycloak create job --from=cronjob/platform-keycloak-realm-sync platform-keycloak-realm-sync-manual-$(date +%s)`
 - `realm-config.json` enables `ext-event-http-sender` to post signed events to:
   - `http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak`
-- The realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
+- The current stage-1 realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
+- In the explicit entitlement model, `learn_member` is treated as an Academy convenience role only; docs and Copilot authorization should read explicit entitlements (`docs_paid*`, `copilot_paid`) instead.
 - Keep the Keycloak database outside the cluster so the workload can be rebuilt without losing identity state.
 
 Keycloakify quick path
-- Build a Keycloakify jar in your theme project (`npm run build-keycloak-theme` or your project equivalent).
+- Build the tracked HybridOps theme jar:
+  - `cd apps/platform/keycloak/theme/hybridops-keycloakify`
+  - `./scripts/build-keycloak-theme.sh`
+  - output: `dist_keycloak/hybridops-theme.jar`
 - Render artifacts with the jar path:
-  - `KEYCLOAK_THEME_JAR_PATH=/absolute/path/to/hybridops-theme.jar ./tools/onprem-learn-stage1/render-artifacts.sh`
+  - `KEYCLOAK_THEME_JAR_PATH=/absolute/path/to/hybridops-theme.jar KEYCLOAK_LOGIN_THEME=hybridops ./tools/onprem-learn-stage1/render-artifacts.sh`
 - Apply the generated secret (`20a-secret-keycloak-theme.yaml`) and restart `platform-keycloak`.

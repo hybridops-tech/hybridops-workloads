@@ -32,6 +32,7 @@ fi
 DB_HOST="${DB_HOST_OVERRIDE:-${DB_HOST:-10.21.0.2}}"
 DB_PORT="${DB_PORT:-5432}"
 DB_SSLMODE="${DB_SSLMODE:-require}"
+PATRONI_SUPERUSER_PASSWORD="${PATRONI_SUPERUSER_PASSWORD:-}"
 
 KEYCLOAK_DB_NAME="${KEYCLOAK_DB_NAME:-keycloak}"
 KEYCLOAK_DB_USER="${KEYCLOAK_DB_USER:-keycloak}"
@@ -41,6 +42,15 @@ KEYCLOAK_ADMIN_PASSWORD="${KEYCLOAK_ADMIN_PASSWORD:-$(rand_b64url 24)}"
 KEYCLOAK_EVENTS_SHARED_SECRET="${KEYCLOAK_EVENTS_SHARED_SECRET:-$(rand_b64url 32)}"
 KEYCLOAK_LOGIN_THEME="${KEYCLOAK_LOGIN_THEME:-keycloak}"
 KEYCLOAK_THEME_JAR_PATH="${KEYCLOAK_THEME_JAR_PATH:-}"
+DEFAULT_KEYCLOAK_THEME_JAR_PATH="${ROOT_DIR}/apps/platform/keycloak/theme/hybridops-keycloakify/dist_keycloak/hybridops-theme.jar"
+
+if [[ -z "${KEYCLOAK_THEME_JAR_PATH}" && -f "${DEFAULT_KEYCLOAK_THEME_JAR_PATH}" ]]; then
+  KEYCLOAK_THEME_JAR_PATH="${DEFAULT_KEYCLOAK_THEME_JAR_PATH}"
+fi
+
+if [[ -n "${KEYCLOAK_THEME_JAR_PATH}" && "${KEYCLOAK_LOGIN_THEME}" == "keycloak" ]]; then
+  KEYCLOAK_LOGIN_THEME="hybridops"
+fi
 
 ENTITLEMENTS_DB_NAME="${ENTITLEMENTS_DB_NAME:-hyops_entitlements}"
 ENTITLEMENTS_DB_USER="${ENTITLEMENTS_DB_USER:-hyops_entitlements}"
@@ -155,6 +165,54 @@ WHERE NOT EXISTS (SELECT 1 FROM pg_database WHERE datname = '${ENTITLEMENTS_DB_N
 ALTER DATABASE "${ENTITLEMENTS_DB_NAME}" OWNER TO "${ENTITLEMENTS_DB_USER}";
 GRANT ALL PRIVILEGES ON DATABASE "${ENTITLEMENTS_DB_NAME}" TO "${ENTITLEMENTS_DB_USER}";
 EOF
+
+cat >"${OUTPUT_DIR}/10a-repair-entitlements-ownership.sh" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -z "\${PATRONI_SUPERUSER_PASSWORD:-}" ]]; then
+  echo "PATRONI_SUPERUSER_PASSWORD is required to repair ownership on ${ENTITLEMENTS_DB_NAME}" >&2
+  exit 1
+fi
+
+PGPASSWORD="\${PATRONI_SUPERUSER_PASSWORD}" \
+psql "postgresql://postgres@${DB_HOST}:${DB_PORT}/${ENTITLEMENTS_DB_NAME}?sslmode=${DB_SSLMODE}" <<'SQL'
+\set ON_ERROR_STOP on
+
+ALTER SCHEMA public OWNER TO "${ENTITLEMENTS_DB_USER}";
+GRANT USAGE, CREATE ON SCHEMA public TO "${ENTITLEMENTS_DB_USER}";
+
+DO \$\$
+DECLARE
+  obj record;
+BEGIN
+  FOR obj IN
+    SELECT format('%I.%I', schemaname, tablename) AS ident
+    FROM pg_tables
+    WHERE schemaname = 'public'
+      AND tableowner <> '${ENTITLEMENTS_DB_USER}'
+  LOOP
+    EXECUTE format('ALTER TABLE %s OWNER TO %I', obj.ident, '${ENTITLEMENTS_DB_USER}');
+  END LOOP;
+
+  FOR obj IN
+    SELECT format('%I.%I', schemaname, sequencename) AS ident
+    FROM pg_sequences
+    WHERE schemaname = 'public'
+      AND sequenceowner <> '${ENTITLEMENTS_DB_USER}'
+  LOOP
+    EXECUTE format('ALTER SEQUENCE %s OWNER TO %I', obj.ident, '${ENTITLEMENTS_DB_USER}');
+  END LOOP;
+END
+\$\$;
+
+GRANT SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER
+  ON ALL TABLES IN SCHEMA public TO "${ENTITLEMENTS_DB_USER}";
+GRANT USAGE, SELECT, UPDATE
+  ON ALL SEQUENCES IN SCHEMA public TO "${ENTITLEMENTS_DB_USER}";
+SQL
+EOF
+chmod +x "${OUTPUT_DIR}/10a-repair-entitlements-ownership.sh"
 
 cat >"${OUTPUT_DIR}/11-apply-entitlements-schema.sh" <<EOF
 #!/usr/bin/env bash
@@ -338,30 +396,51 @@ Credential reuse
 - To rotate the generated credentials, delete \`${OUTPUT_DIR}/00-env.sh\` first or run with \`REUSE_EXISTING_ENV=0\`.
 - To keep the current credentials but point at a different PostgreSQL endpoint, rerun with \`DB_HOST_OVERRIDE=<new-host>\`.
 
+Load the generated environment first:
+
+\`\`\`bash
+source "${OUTPUT_DIR}/00-env.sh"
+\`\`\`
+
+Before step 2, ensure the Patroni superuser password is available in your shell:
+
+\`\`\`bash
+export PATRONI_SUPERUSER_PASSWORD='...'
+\`\`\`
+
 1. Create or update the external PostgreSQL roles and databases:
 
 \`\`\`bash
 psql "postgresql://postgres@${DB_HOST}:${DB_PORT}/postgres?sslmode=${DB_SSLMODE}" -f "${OUTPUT_DIR}/10-create-databases.sql"
 \`\`\`
 
-2. Apply the entitlements schema:
+2. Normalize entitlements ownership and grants on an existing database:
+
+\`\`\`bash
+"${OUTPUT_DIR}/10a-repair-entitlements-ownership.sh"
+\`\`\`
+
+3. Apply the entitlements schema:
 
 \`\`\`bash
 "${OUTPUT_DIR}/11-apply-entitlements-schema.sh"
 \`\`\`
 
-3. Apply the Kubernetes Secrets:
+4. Apply the Kubernetes Secrets:
 
 \`\`\`bash
 kubectl apply -f "${OUTPUT_DIR}/20-secret-keycloak.yaml"
-if [[ -f "${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml" ]]; then kubectl apply -f "${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml"; fi
+if [[ -f "${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml" ]]; then
+  kubectl -n keycloak delete secret platform-keycloak-theme --ignore-not-found
+  kubectl create -f "${OUTPUT_DIR}/20a-secret-keycloak-theme.yaml"
+fi
 kubectl apply -f "${OUTPUT_DIR}/21-secret-entitlements.yaml"
 kubectl apply -f "${OUTPUT_DIR}/22-secret-academy.yaml"
 kubectl apply -f "${OUTPUT_DIR}/23-secret-entitlements-runtime.yaml"
 kubectl apply -f "${OUTPUT_DIR}/24-secret-academy-runtime.yaml"
 \`\`\`
 
-4. Choose one deployment path:
+5. Choose one deployment path:
 
 - GitOps after push:
 
