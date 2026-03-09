@@ -70,6 +70,39 @@ Notes
 - Moodle is not the docs renderer; docs remain on MkDocs/Cloudflare.
 - Moodle enrollment should be driven from explicit Academy entitlements, not a generic member role.
 
+### Stage-2 SSO assumptions
+
+- Moodle uses the same Keycloak realm as Learn.
+- Moodle gets its own client; it must not reuse the Learn client directly.
+- Learn remains the public entry surface; Moodle is the course-delivery surface.
+- Authentication in Moodle does not by itself grant course access.
+
+### Stage-2 enrollment rule
+
+Recommended rule:
+
+- entitlements stay authoritative
+- Moodle reflects access through enrollment sync or launch-time checks
+- do not recreate billing or entitlement authority inside Moodle
+
+This means:
+
+- `academy_all` or `academy_track:<slug>` should map to course access
+- a generic authenticated session should not map to course access
+
+### Stage-2 rollout order
+
+1. stand up `education/moodle`
+2. confirm external PostgreSQL and object storage
+3. configure Keycloak SSO for Moodle
+4. create one course per canonical Academy track
+5. set `ACADEMY_LMS_BASE_URL` in Learn runtime
+6. validate member launch from:
+   - Academy workspace
+   - Account page
+   - track outline page
+7. verify fallback behavior with `ACADEMY_LMS_BASE_URL` unset
+
 ## Argo CD Workloads (Stage 1 Minimum)
 
 Enable in the low-cost hybrid target:
@@ -84,6 +117,8 @@ Enable in the low-cost hybrid target:
 - Do not make Copilot access control frontend-only; backend entitlement checks remain source of truth.
 - Do not duplicate technical docs into Moodle; link to the docs site.
 - Keep public and paid docs indexes separate for Copilot retrieval.
+- Do not let Moodle become the public marketing surface for Academy.
+- Do not hardcode Moodle hostnames in Learn routes; use `ACADEMY_LMS_BASE_URL` plus per-track course paths.
 
 ## Stage-1 Identity and Entitlements
 
