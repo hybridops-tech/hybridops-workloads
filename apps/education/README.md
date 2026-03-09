@@ -1,4 +1,4 @@
 # Education Apps
 
 Current apps:
-- moodle
+- `moodle` (Stage 2 contract defined; see `apps/education/moodle/README.md`)

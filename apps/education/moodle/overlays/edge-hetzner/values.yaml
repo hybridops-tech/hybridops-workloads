@@ -1,3 +1,5 @@
 # Edge-Hetzner overrides (draft)
 hyops:
   env: edge-hetzner
+  ingress:
+    host: learn-lms.example.invalid

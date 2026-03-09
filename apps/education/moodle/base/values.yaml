@@ -1,6 +1,16 @@
-# Base values (draft)
+# Base values contract (Stage 2)
+#
+# This file defines the HybridOps runtime contract for Moodle.
+# Map these keys into the chosen Helm chart values rather than treating this file
+# as chart-native input. The chart itself may change; the contract below should not.
 hyops:
   profile: base
+
+  ingress:
+    required: true
+    host: learn-lms.example.invalid
+    tlsSecretName: REPLACE_TLS_SECRET_NAME
+
   externalState:
     postgres:
       required: true
@@ -8,6 +18,8 @@ hyops:
       port: 5432
       database: moodle
       sslMode: require
+      credentialsSecretRef:
+        name: moodle-postgres
     postgresDrReplica:
       host: REPLACE_EXT_POSTGRES_RO_DR_HOST
       port: 5432
@@ -20,6 +32,48 @@ hyops:
       credentialsSecretRef:
         name: moodle-object-storage
 
-# External state contract (anti-drift)
-# Moodle production state must be externalized: PostgreSQL + object storage for moodledata.
-# Map these placeholders to your Helm chart values.
+  sso:
+    required: true
+    provider: keycloak
+    moodlePlugin: auth_oidc
+    issuerUrl: https://auth.example.invalid/realms/hybridops
+    displayName: HybridOps SSO
+    loginFlow: authorization_request
+    client:
+      id: hyops-moodle
+      secretRef:
+        name: moodle-sso
+        key: client-secret
+      redirectUri: https://learn-lms.example.invalid/admin/oauth2callback.php
+    userMapping:
+      username: preferred_username
+      email: email
+      firstname: given_name
+      lastname: family_name
+      subject: sub
+      subjectTargetField: idnumber
+
+  accessSync:
+    required: true
+    source: entitlements-api
+    apiUrl: http://platform-entitlements-api.entitlements.svc.cluster.local:8080
+    tokenSecretRef:
+      name: moodle-entitlements
+      key: api-token
+    mode: enrollment-sync
+    syncOnLogin: true
+    reconcileCron: true
+    academyAllKey: academy_all
+    academyTrackPrefix: academy_track:
+    courseShortnames:
+      networking-foundations: networking-foundations
+      contract-driven-automation: contract-driven-automation
+      verification-driven-operations: verification-driven-operations
+      platform-services: platform-services
+      ipam-driven-infrastructure: ipam-driven-infrastructure
+      disaster-recovery-automation: disaster-recovery-automation
+
+# Anti-drift
+# - Moodle production state must be externalized: PostgreSQL + object storage for moodledata.
+# - Do not reuse the Learn OIDC client for Moodle; use a dedicated confidential client.
+# - Do not let generic authentication imply course access; access must come from explicit Academy entitlements.

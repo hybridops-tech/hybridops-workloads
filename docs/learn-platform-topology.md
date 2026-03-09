@@ -66,6 +66,9 @@ Additions
 - Same Keycloak OIDC provider
 - Same Entitlements API as the source of truth
 
+Detailed workload contract
+- `apps/education/moodle/README.md`
+
 Notes
 - Moodle is not the docs renderer; docs remain on MkDocs/Cloudflare.
 - Moodle enrollment should be driven from explicit Academy entitlements, not a generic member role.
@@ -73,9 +76,10 @@ Notes
 ### Stage-2 SSO assumptions
 
 - Moodle uses the same Keycloak realm as Learn.
-- Moodle gets its own client; it must not reuse the Learn client directly.
+- Moodle gets its own confidential client; it must not reuse the Learn client directly.
 - Learn remains the public entry surface; Moodle is the course-delivery surface.
 - Authentication in Moodle does not by itself grant course access.
+- Redirect URI target is `https://<moodle-host>/admin/oauth2callback.php`.
 
 ### Stage-2 enrollment rule
 
@@ -88,6 +92,7 @@ Recommended rule:
 This means:
 
 - `academy_all` or `academy_track:<slug>` should map to course access
+- canonical course shortnames should match canonical Learn track slugs
 - a generic authenticated session should not map to course access
 
 ### Stage-2 rollout order
