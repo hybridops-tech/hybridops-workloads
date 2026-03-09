@@ -39,6 +39,9 @@ hyops:
     issuerUrl: https://auth.example.invalid/realms/hybridops
     displayName: HybridOps SSO
     loginFlow: authorization_request
+    pluginProvisioning:
+      required: true
+      mode: REPLACE_PREBAKED_IMAGE_OR_PLUGIN_FETCH
     client:
       id: hyops-moodle
       secretRef:
@@ -46,12 +49,11 @@ hyops:
         key: client-secret
       redirectUri: https://learn-lms.example.invalid/admin/oauth2callback.php
     userMapping:
-      username: preferred_username
       email: email
       firstname: given_name
       lastname: family_name
-      subject: sub
-      subjectTargetField: idnumber
+      stableSubjectClaim: sub
+      stableSubjectTargetField: idnumber
 
   accessSync:
     required: true
@@ -77,3 +79,4 @@ hyops:
 # - Moodle production state must be externalized: PostgreSQL + object storage for moodledata.
 # - Do not reuse the Learn OIDC client for Moodle; use a dedicated confidential client.
 # - Do not let generic authentication imply course access; access must come from explicit Academy entitlements.
+# - Treat accessSync as a required integration contract; the reconciler implementation is not shipped yet in this repo.

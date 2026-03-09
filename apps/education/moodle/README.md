@@ -33,12 +33,14 @@ Moodle side
 - Provider display name: `HybridOps SSO`
 - Login flow: `Authorization Request`
 - Allow first-login account creation so Academy users can be provisioned on demand
-- Map the following claims:
-  - `preferred_username` -> username
+- Minimum mappings to require:
   - `email` -> email
   - `given_name` -> firstname
   - `family_name` -> lastname
-  - `sub` -> `idnumber`
+- Stable identifier:
+  - keep `sub` as the authoritative external subject
+  - map it into `idnumber` only if the selected Moodle/plugin version supports that field mapping cleanly
+  - do not make custom username-claim mapping part of the base contract until it is tested end to end
 
 Keycloak side
 - Client ID: `hyops-moodle`
@@ -54,6 +56,13 @@ Keycloak side
 Anti-drift rule
 - Do not reuse the Learn client (`hyops-learn`) for Moodle.
 - Learn and Moodle are different relying parties with different redirect and logout behavior.
+
+Plugin packaging contract
+- `auth_oidc` must be present in the Moodle runtime before SSO configuration begins.
+- Acceptable delivery models:
+  - pre-baked Moodle image with the plugin installed
+  - controlled plugin fetch during image build or init
+- Do not depend on ad hoc web-admin plugin installation as the production path.
 
 Enrollment sync contract
 
@@ -73,6 +82,14 @@ Delivery model
 - Background reconcile: enabled
 - Learn remains the commercial and routing surface
 - Moodle reflects course availability only
+
+Implementation boundary
+- This repo defines the required enrollment-sync contract.
+- It does not yet ship the reconciler implementation itself.
+- Before go-live, choose and build one delivery path:
+  - dedicated sync job
+  - service inside the Moodle workload
+  - external controller
 
 Canonical track-to-course mapping
 - Course shortname must match the canonical Learn track slug:
