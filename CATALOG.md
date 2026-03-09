@@ -3,20 +3,21 @@
 ## Cluster rollout targets
 
 - `clusters/onprem-smoke` (smoke proof)
-- `clusters/onprem-stage1` (guestbook + velero + loki)
-- `clusters/onprem-learn-stage1` (keycloak + entitlements + learn SSR behind Cloudflare-hosted public/docs surfaces)
+- `clusters/onprem-stage1` (guestbook + velero + loki baseline)
 - `clusters/onprem` (full on-prem app catalog)
 
 ## App catalog
 
-- platform/keycloak (learn-stage1 ready)
-- platform/entitlements-api (learn-stage1 ready)
+- platform/keycloak (draft)
+- platform/entitlements-api (draft)
 - platform/velero (draft)
+- platform/gitlab-runner (draft)
 - observability/kube-prometheus-stack (draft)
 - observability/loki (draft)
 - observability/thanos-compactor (draft)
 - business/nextcloud (draft)
 - business/zammad (draft)
 - education/moodle (draft)
-- academy/website (learn-stage1 ready)
+- academy/website (draft)
 - studio/docsgpt (draft)
+

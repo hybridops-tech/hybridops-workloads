@@ -21,7 +21,7 @@ Recommended mode
 - Set `runner-registration-token` to an empty string to satisfy charts that still check for both keys.
 
 Notes
-- This app is intentionally not included in `clusters/onprem-learn-stage1`.
+- This app is intentionally not bundled into Learn-specific targets by default.
 - Add it only after the GitLab runner token exists.
 - The current cluster has only control-plane nodes online, so the runner is not pinned to a worker-node selector.
 - If you later restore dedicated worker nodes, add a node selector or affinity and keep the runner manager off control-plane nodes.

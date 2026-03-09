@@ -1,13 +1,13 @@
 # Platform Keycloak
 
 Purpose
-- Host the HybridOps OIDC realm for Learn sign-in at `auth.hybridops.tech`.
+- Host the OIDC realm for Learn sign-in.
 - Keep Keycloak stateless in-cluster by using an external PostgreSQL database.
 
 Runtime contract
 - Namespace: `keycloak`
 - Service: `platform-keycloak`
-- Ingress host: `auth.hybridops.tech`
+- Ingress host: overlay-defined
 - Image: `quay.io/keycloak/keycloak:24.0`
 - Declarative realm sync: `adorsys/keycloak-config-cli` (`CronJob`)
 - Realm config source: `manifests/base/realm-config.json`
@@ -34,7 +34,7 @@ Non-secret config
   - `KC_HEALTH_ENABLED=true`
   - `KC_METRICS_ENABLED=true`
   - `KC_PROXY_HEADERS=xforwarded`
-  - `KC_HOSTNAME=auth.hybridops.tech`
+  - `KC_HOSTNAME` (set by overlay)
   - `KC_HOSTNAME_STRICT=true`
   - `KEYCLOAK_EVENTS_EXTENSION_JAR_URL=https://repo1.maven.org/maven2/io/phasetwo/keycloak/keycloak-events/0.29/keycloak-events-0.29.jar`
 
@@ -45,7 +45,7 @@ Notes
 - Realm state is reconciled against `realm-config.json` through the in-cluster config-cli jobs.
 - To force an immediate sync (outside the cron schedule), run:
   - `kubectl -n keycloak create job --from=cronjob/platform-keycloak-realm-sync platform-keycloak-realm-sync-manual-$(date +%s)`
-- `realm-config.json` enables `ext-event-http-sender` to post signed events to:
+- `realm-config.json` enables `ext-event-http` to post signed events to:
   - `http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak`
 - The current stage-1 realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
 - In the explicit entitlement model, `learn_member` is treated as an Academy convenience role only; docs and Copilot authorization should read explicit entitlements (`docs_paid*`, `copilot_paid`) instead.
@@ -56,6 +56,6 @@ Keycloakify quick path
   - `cd apps/platform/keycloak/theme/hybridops-keycloakify`
   - `./scripts/build-keycloak-theme.sh`
   - output: `dist_keycloak/hybridops-theme.jar`
-- Render artifacts with the jar path:
-  - `KEYCLOAK_THEME_JAR_PATH=/absolute/path/to/hybridops-theme.jar KEYCLOAK_LOGIN_THEME=hybridops ./tools/onprem-learn-stage1/render-artifacts.sh`
-- Apply the generated secret (`20a-secret-keycloak-theme.yaml`) and restart `platform-keycloak`.
+- If you use a runtime renderer or secret-generation flow, pass:
+  - `KEYCLOAK_THEME_JAR_PATH=/absolute/path/to/hybridops-theme.jar`
+  - `KEYCLOAK_LOGIN_THEME=hybridops`

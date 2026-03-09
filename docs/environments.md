@@ -6,7 +6,6 @@ Targets define Kubernetes topology and rollout maturity.
 
 - `onprem-smoke` (minimal smoke proof)
 - `onprem-stage1` (curated baseline)
-- `onprem-learn-stage1` (learn auth + hosting bundle)
 - `onprem` (full catalog)
 - `burst` (GKE/AKS when provisioned)
 
@@ -14,7 +13,6 @@ Paths:
 
 - `clusters/onprem-smoke`
 - `clusters/onprem-stage1`
-- `clusters/onprem-learn-stage1`
 - `clusters/onprem`
 - `clusters/burst` (optional)
 
@@ -23,4 +21,5 @@ layers and are not encoded in workload paths.
 
 Notes:
 
-- Edge services are not managed by this repo. They are provisioned via Ansible on the edge VPS pair.
+- Edge services are deployment-specific and are not implied by this repo alone.
+

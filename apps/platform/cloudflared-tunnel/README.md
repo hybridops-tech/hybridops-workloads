@@ -19,7 +19,7 @@ Cloudflare public hostname mappings
 - `entitlements.hybridops.tech` -> `http://platform-entitlements-api.entitlements.svc.cluster.local:8080`
 
 Notes
-- This workload is intentionally not added to `clusters/onprem-learn-stage1` until the Cloudflare tunnel token exists.
+- Add this workload only after the Cloudflare tunnel token exists.
 - Because the tunnel is outbound-only, you do not need public NAT rules to the cluster for these three hosts.
 - For Stage 1, the public/docs static surfaces remain on Cloudflare hosting and only the authenticated/runtime surfaces go through the tunnel.
 - `cloudflare/cloudflared:latest` is acceptable for the current dev path; pin a tested tag before calling the edge deployment release-grade.

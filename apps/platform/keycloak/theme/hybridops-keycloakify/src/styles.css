@@ -3,6 +3,8 @@ purpose: HybridOps Keycloak login theme — aligned with hybridops.tech marketin
 maintainer: HybridOps
 */
 
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
 :root {
   /* Surfaces — match marketing site tokens */
   --hyops-bg: #f8fafc;
@@ -46,8 +48,9 @@ maintainer: HybridOps
   --hyops-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.07), 0 1px 2px rgba(15, 23, 42, 0.04);
   --hyops-shadow-md: 0 8px 24px rgba(15, 23, 42, 0.10), 0 2px 6px rgba(15, 23, 42, 0.06);
 
-  /* Font — stable cross-platform UI stack */
-  --hyops-font: Inter, "Segoe UI", "Helvetica Neue", Arial, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  /* Font — align with Learn site */
+  --hyops-font: "IBM Plex Sans", "Segoe UI", "Helvetica Neue", Arial, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --hyops-font-mono: "IBM Plex Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 *,
@@ -68,12 +71,17 @@ maintainer: HybridOps
 /* ── Page root ──────────────────────────────── */
 
 html.login-pf,
+html.kcHtmlClass,
 html.login-pf body,
-html.login-pf #root {
+html.kcHtmlClass body,
+body.kcBodyClass,
+html.login-pf #root,
+html.kcHtmlClass #root {
   min-height: 100%;
 }
 
-html.login-pf body {
+html.login-pf body,
+body.kcBodyClass {
   margin: 0;
   font-family: var(--hyops-font);
   color: var(--hyops-text);
@@ -113,27 +121,21 @@ html.login-pf body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   color: var(--hyops-text);
-  font-size: 17px;
+  font-family: var(--hyops-font);
+  font-size: 1rem;
+  line-height: 1.1;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
 #kc-header-wrapper::before {
-  content: "H";
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  background: var(--hyops-accent-dim);
-  border: 1px solid rgba(37, 99, 235, 0.22);
-  color: var(--hyops-accent);
-  font-weight: 600;
-  font-size: 15px;
-  flex-shrink: 0;
+  content: "";
+  width: 32px;
+  height: 32px;
+  flex: 0 0 32px;
+  background: url("../hyops-auth-mark.svg") center / contain no-repeat;
 }
 
 /* ── Card ───────────────────────────────────── */
@@ -545,9 +547,32 @@ input[type="radio"],
 }
 
 #kc-registration-container,
-#kc-registration,
-#kc-registration span {
+#kc-registration {
   color: var(--hyops-text-2);
+}
+
+#kc-registration > span {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.28rem;
+  color: var(--hyops-text-2);
+}
+
+#kc-info-wrapper #kc-registration a,
+#kc-info-wrapper #kc-registration a:visited,
+#kc-info-wrapper #kc-registration span a,
+#kc-info-wrapper #kc-registration span a:visited {
+  color: var(--hyops-accent) !important;
+  font-weight: 500;
+  text-decoration: none !important;
+}
+
+#kc-info-wrapper #kc-registration a:hover,
+#kc-info-wrapper #kc-registration a:focus-visible,
+#kc-info-wrapper #kc-registration span a:hover,
+#kc-info-wrapper #kc-registration span a:focus-visible {
+  color: var(--hyops-accent-hover) !important;
+  text-decoration: underline;
 }
 
 /* ── Alerts ─────────────────────────────────── */

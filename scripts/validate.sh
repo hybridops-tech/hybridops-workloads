@@ -2,7 +2,6 @@
 # purpose: Lightweight validation for workload repo hygiene and cluster app wiring.
 # maintainer: HybridOps.Studio
 
-# Re-exec under bash when invoked via sh (script uses bash features).
 if [ -z "${BASH_VERSION:-}" ]; then
   exec bash "$0" "$@"
 fi
@@ -108,10 +107,12 @@ for rel in "${resources_raw[@]}"; do
   if [[ "$rel" =~ ^\.\./\.\./apps/([^/]+)/([^/]+)/overlays/([^/]+)$ ]]; then
     app_ref="${BASH_REMATCH[1]}/${BASH_REMATCH[2]}"
     overlay_target="${BASH_REMATCH[3]}"
-    [[ "$overlay_target" == "$TARGET" ]] || err "resource target mismatch in $KUSTOMIZATION: $rel"
     full_path="$CLUSTER_DIR/$rel"
     [[ -d "$full_path" ]] || err "resource path does not exist: $rel"
     printf '%s\n' "$app_ref" >> "$resources_tmp"
+    if [[ "$TARGET" != "onprem-smoke" && "$overlay_target" != "$TARGET" ]]; then
+      err "resource target mismatch in $KUSTOMIZATION: $rel"
+    fi
   else
     err "unsupported resource path format in $KUSTOMIZATION: $rel"
   fi

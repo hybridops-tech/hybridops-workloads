@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, lazy, useEffect, useLayoutEffect } from "react";
 import type { ClassKey } from "keycloakify/login";
 import type { KcContext } from "./KcContext";
 import { useI18n } from "./i18n";
@@ -18,11 +18,10 @@ function clearMarkerValue(value: unknown) {
 }
 
 function sanitizeRegisterMarker(kcContext: KcContext) {
-    if (kcContext.pageId !== "register.ftl") {
-        return;
-    }
-
     const ctx = kcContext as unknown as {
+        username?: string;
+        login?: { username?: string };
+        auth?: { attemptedUsername?: string };
         register?: { formData?: { email?: string } };
         profile?: {
             formData?: { email?: string };
@@ -35,6 +34,27 @@ function sanitizeRegisterMarker(kcContext: KcContext) {
             >;
         };
     };
+
+    if (kcContext.pageId === "login.ftl") {
+        if ("username" in ctx) {
+            ctx.username = String(clearMarkerValue(ctx.username) || "");
+        }
+
+        if (ctx.login) {
+            ctx.login.username = String(clearMarkerValue(ctx.login.username) || "");
+        }
+
+        if (ctx.auth) {
+            ctx.auth.attemptedUsername = String(
+                clearMarkerValue(ctx.auth.attemptedUsername) || ""
+            );
+        }
+        return;
+    }
+
+    if (kcContext.pageId !== "register.ftl") {
+        return;
+    }
 
     if (ctx.register?.formData) {
         ctx.register.formData.email = String(clearMarkerValue(ctx.register.formData.email) || "");
@@ -114,37 +134,51 @@ export default function KcPage(props: { kcContext: KcContext }) {
     const { kcContext } = props;
     sanitizeRegisterMarker(kcContext);
 
-    const { i18n } = useI18n({ kcContext });
-
-    useEffect(() => {
-        if (kcContext.pageId !== "login.ftl") {
-            return;
-        }
-
-        const search = new URLSearchParams(window.location.search);
-        const prompt = String(search.get("prompt") || "")
-            .trim()
-            .toLowerCase();
-        const intent = String(search.get("intent") || "")
-            .trim()
-            .toLowerCase();
-        const loginHint = String(search.get("login_hint") || "")
-            .trim()
-            .toLowerCase();
-        const contextUsername = String(
-            (kcContext as unknown as { username?: string }).username || ""
-        )
-            .trim()
-            .toLowerCase();
-        const referrer = String(document.referrer || "")
-            .trim()
-            .toLowerCase();
-        const shouldOpenRegister =
-            prompt === "create" ||
+    const search = new URLSearchParams(window.location.search);
+    const prompt = String(search.get("prompt") || "")
+        .trim()
+        .toLowerCase();
+    const intent = String(search.get("intent") || "")
+        .trim()
+        .toLowerCase();
+    const loginHint = String(search.get("login_hint") || "")
+        .trim()
+        .toLowerCase();
+    const contextUsername = String(
+        (kcContext as unknown as { username?: string }).username || ""
+    )
+        .trim()
+        .toLowerCase();
+    const referrer = String(document.referrer || "")
+        .trim()
+        .toLowerCase();
+    const shouldOpenRegister =
+        kcContext.pageId === "login.ftl" &&
+        (prompt === "create" ||
             intent === "register" ||
             loginHint === REGISTER_LOGIN_HINT_MARKER ||
             contextUsername === REGISTER_LOGIN_HINT_MARKER ||
-            referrer.includes("intent=register");
+            referrer.includes("intent=register"));
+    const registrationUrl = String(
+        (kcContext as unknown as { url?: { registrationUrl?: string } }).url
+            ?.registrationUrl || ""
+    ).trim();
+
+    if (
+        shouldOpenRegister &&
+        registrationUrl &&
+        !window.location.pathname.includes("/login-actions/registration")
+    ) {
+        window.location.replace(registrationUrl);
+        return null;
+    }
+
+    const { i18n } = useI18n({ kcContext });
+
+    useLayoutEffect(() => {
+        if (kcContext.pageId !== "login.ftl") {
+            return;
+        }
 
         if (!shouldOpenRegister) {
             return;
@@ -153,11 +187,6 @@ export default function KcPage(props: { kcContext: KcContext }) {
         if (window.location.pathname.includes("/login-actions/registration")) {
             return;
         }
-
-        const registrationUrl = String(
-            (kcContext as unknown as { url?: { registrationUrl?: string } }).url
-                ?.registrationUrl || ""
-        ).trim();
 
         if (!registrationUrl) {
             return;

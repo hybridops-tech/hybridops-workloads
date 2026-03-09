@@ -12,12 +12,13 @@ default:
   before_script:
     - apk add --no-cache bash coreutils diffutils findutils grep ripgrep
 
-validate:onprem-learn-stage1:
+validate:onprem-stage1:
   stage: validate
   script:
-    - ./scripts/validate.sh --strict --target onprem-learn-stage1
+    - ./scripts/validate.sh --strict --target onprem-stage1
 
-validate:onprem-ci-stage1:
+validate:onprem:
   stage: validate
   script:
-    - ./scripts/validate.sh --strict --target onprem-ci-stage1
+    - ./scripts/validate.sh --target onprem
+

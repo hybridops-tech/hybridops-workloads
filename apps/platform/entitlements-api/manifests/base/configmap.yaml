@@ -17,8 +17,8 @@ data:
   ENTITLEMENT_DOCS_YEARLY_KEY: docs_paid_yearly
   ENTITLEMENT_COPILOT_PAID_KEY: copilot_paid
   KEYCLOAK_SYNC_ENABLED: "false"
-  KEYCLOAK_ISSUER_URL: https://auth.hybridops.tech/realms/hybridops
-  KEYCLOAK_ADMIN_BASE_URL: https://auth.hybridops.tech
+  KEYCLOAK_ISSUER_URL: https://auth.example.invalid/realms/hybridops
+  KEYCLOAK_ADMIN_BASE_URL: https://auth.example.invalid
   KEYCLOAK_ADMIN_REALM: hybridops
   KEYCLOAK_ADMIN_CLIENT_ID: hyops-entitlements-api
   KEYCLOAK_ACADEMY_ROLE: learn_member

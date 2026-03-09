@@ -5,7 +5,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: entitlements.hybridops.tech
+    - host: entitlements.example.invalid
       http:
         paths:
           - path: /

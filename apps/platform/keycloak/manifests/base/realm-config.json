@@ -36,7 +36,7 @@
     {
       "clientId": "hyops-learn",
       "name": "HybridOps Learn",
-      "description": "PKCE OIDC client for learn.hybridops.tech",
+      "description": "PKCE OIDC client for learn.example.invalid",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
@@ -48,15 +48,15 @@
       "frontchannelLogout": true,
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "https://learn.hybridops.tech/learn/academy",
+        "post.logout.redirect.uris": "https://learn.example.invalid/learn/academy",
         "client.session.idle.timeout": "0",
         "client.session.max.lifespan": "0"
       },
       "redirectUris": [
-        "https://learn.hybridops.tech/learn/auth/callback"
+        "https://learn.example.invalid/learn/auth/callback"
       ],
       "webOrigins": [
-        "https://learn.hybridops.tech"
+        "https://learn.example.invalid"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -97,10 +97,10 @@
   "eventsExpiration": 604800,
   "eventsListeners": [
     "jboss-logging",
-    "ext-event-http-sender"
+    "ext-event-http"
   ],
   "attributes": {
-    "_providerConfig.ext-event-http-sender.1": "{\"targetUri\":\"http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak\",\"sharedSecret\":\"$(env:KEYCLOAK_EVENTS_SHARED_SECRET)\",\"hmacAlgorithm\":\"HmacSHA256\",\"retry\":true}"
+    "_providerConfig.ext-event-http.1": "{\"targetUri\":\"http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak\",\"sharedSecret\":\"$(env:KEYCLOAK_EVENTS_SHARED_SECRET)\",\"hmacAlgorithm\":\"HmacSHA256\",\"retry\":true}"
   },
   "adminEventsEnabled": true,
   "adminEventsDetailsEnabled": true,
