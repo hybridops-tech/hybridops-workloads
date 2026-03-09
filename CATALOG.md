@@ -17,6 +17,6 @@
 - observability/thanos-compactor (draft)
 - business/nextcloud (draft)
 - business/zammad (draft)
-- education/moodle (stage2 contract defined)
+- education/moodle (stage2 chart pinned, image strategy defined)
 - academy/website (draft)
 - studio/docsgpt (draft)

@@ -5,25 +5,29 @@ Purpose
 - Reuse the existing Keycloak and Entitlements API platform components instead of creating a second identity or billing authority.
 
 Status
-- Stage 2 contract defined.
+- Stage 2 chart and image strategy defined.
 - Public Learn remains the entry surface.
 - Moodle becomes the authenticated course-delivery surface only.
 
 Runtime contract
 - Namespace: `moodle`
 - Argo CD application: `education-moodle`
+- Helm chart: Bitnami Moodle `28.0.0`
+- Chart repo: `https://charts.bitnami.com/bitnami`
 - Ingress host: overlay-defined, recommended pattern `learn-lms.<domain>`
 - Database: external PostgreSQL read-write endpoint
 - DR database endpoint: optional read-only replica
-- File state: external object storage for `moodledata`
+- Runtime image: pre-baked custom image derived from `docker.io/bitnami/moodle:5.0.2-debian-12-r1`
+- File state bridge: pre-provisioned claim via `persistence.existingClaim`
 
 Production state rule
 - Do not use chart-managed database state for production.
-- Do not use cluster-local PVs as the authoritative `moodledata` store.
+- Do not use default chart-created PVCs as the authoritative production `moodledata` path.
 
 Authoritative config surface
 - `base/values.yaml`
 - `base/keycloak-client.template.json`
+- `image/README.md`
 
 SSO contract
 
@@ -59,9 +63,12 @@ Anti-drift rule
 
 Plugin packaging contract
 - `auth_oidc` must be present in the Moodle runtime before SSO configuration begins.
-- Acceptable delivery models:
+- Chosen delivery model:
   - pre-baked Moodle image with the plugin installed
-  - controlled plugin fetch during image build or init
+- Tracked image scaffold:
+  - `image/Dockerfile.template`
+- Chart interaction:
+  - `global.security.allowInsecureImages=true` is required because the chosen image is custom, not stock Bitnami
 - Do not depend on ad hoc web-admin plugin installation as the production path.
 
 Enrollment sync contract
@@ -106,8 +113,8 @@ Compatibility note
 
 Bring-up order
 1. Set the overlay host and TLS settings.
-2. Wire external PostgreSQL and object storage.
-3. Ensure the selected Moodle image/chart includes `auth_oidc`.
+2. Build and publish the pre-baked Moodle image with `auth_oidc`.
+3. Wire external PostgreSQL and the pre-provisioned data claim.
 4. Create the Keycloak `hyops-moodle` client from the tracked template.
 5. Configure the Moodle OIDC service and claim mappings.
 6. Create one Moodle course per canonical track shortname.
@@ -124,3 +131,4 @@ What not to do
 - Do not make Moodle the public marketing surface.
 - Do not duplicate docs content into Moodle.
 - Do not let Moodle become the authority for billing or entitlement state.
+- Do not use the stock Bitnami image directly if `auth_oidc` is required for sign-in.

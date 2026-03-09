@@ -12,9 +12,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: moodle
   sources:
-    - repoURL: REPLACE_CHART_REPO_URL
+    - repoURL: https://charts.bitnami.com/bitnami
       chart: moodle
-      targetRevision: REPLACE_CHART_VERSION
+      targetRevision: 28.0.0
       helm:
         valueFiles:
           - $values/apps/education/moodle/base/values.yaml

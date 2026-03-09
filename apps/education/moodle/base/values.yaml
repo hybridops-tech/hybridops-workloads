@@ -1,82 +1,87 @@
-# Base values contract (Stage 2)
+global:
+  security:
+    allowInsecureImages: true
+
+# Bitnami Moodle chart values
 #
-# This file defines the HybridOps runtime contract for Moodle.
-# Map these keys into the chosen Helm chart values rather than treating this file
-# as chart-native input. The chart itself may change; the contract below should not.
-hyops:
-  profile: base
+# Chosen chart:
+# - repo: https://charts.bitnami.com/bitnami
+# - chart: moodle
+# - version: 28.0.0
+#
+# Chosen runtime model:
+# - external PostgreSQL (pgsql)
+# - pre-baked custom Moodle image with auth_oidc included
+# - single replica first
+# - cluster ingress + TLS
+# - pre-provisioned data claim until the object-storage-backed moodledata path is implemented cleanly
 
-  ingress:
-    required: true
-    host: learn-lms.example.invalid
-    tlsSecretName: REPLACE_TLS_SECRET_NAME
+fullnameOverride: education-moodle
 
-  externalState:
-    postgres:
-      required: true
-      host: REPLACE_EXT_POSTGRES_RW_HOST
-      port: 5432
-      database: moodle
-      sslMode: require
-      credentialsSecretRef:
-        name: moodle-postgres
-    postgresDrReplica:
-      host: REPLACE_EXT_POSTGRES_RO_DR_HOST
-      port: 5432
-      sslMode: require
-    objectStorage:
-      required: true
-      provider: REPLACE_AZURE_BLOB_OR_GCS
-      bucket: REPLACE_MOODLEDATA_BUCKET
-      endpoint: REPLACE_IF_NON_DEFAULT
-      credentialsSecretRef:
-        name: moodle-object-storage
+image:
+  registry: REPLACE_IMAGE_REGISTRY
+  repository: REPLACE_PREBAKED_MOODLE_IMAGE_REPOSITORY
+  tag: REPLACE_PREBAKED_MOODLE_IMAGE_TAG
+  pullPolicy: IfNotPresent
 
-  sso:
-    required: true
-    provider: keycloak
-    moodlePlugin: auth_oidc
-    issuerUrl: https://auth.example.invalid/realms/hybridops
-    displayName: HybridOps SSO
-    loginFlow: authorization_request
-    pluginProvisioning:
-      required: true
-      mode: REPLACE_PREBAKED_IMAGE_OR_PLUGIN_FETCH
-    client:
-      id: hyops-moodle
-      secretRef:
-        name: moodle-sso
-        key: client-secret
-      redirectUri: https://learn-lms.example.invalid/admin/oauth2callback.php
-    userMapping:
-      email: email
-      firstname: given_name
-      lastname: family_name
-      stableSubjectClaim: sub
-      stableSubjectTargetField: idnumber
+replicaCount: 1
 
-  accessSync:
-    required: true
-    source: entitlements-api
-    apiUrl: http://platform-entitlements-api.entitlements.svc.cluster.local:8080
-    tokenSecretRef:
-      name: moodle-entitlements
-      key: api-token
-    mode: enrollment-sync
-    syncOnLogin: true
-    reconcileCron: true
-    academyAllKey: academy_all
-    academyTrackPrefix: academy_track:
-    courseShortnames:
-      networking-foundations: networking-foundations
-      contract-driven-automation: contract-driven-automation
-      verification-driven-operations: verification-driven-operations
-      platform-services: platform-services
-      ipam-driven-infrastructure: ipam-driven-infrastructure
-      disaster-recovery-automation: disaster-recovery-automation
+updateStrategy:
+  type: Recreate
 
+allowEmptyPassword: false
+usePasswordFiles: true
+moodleSkipInstall: false
+moodleSiteName: HybridOps Academy
+moodleUsername: admin
+moodleEmail: academy@example.invalid
+existingSecret: moodle-admin
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  hostname: learn-lms.example.invalid
+  path: /
+  pathType: ImplementationSpecific
+  tls: true
+  ingressClassName: ""
+
+mariadb:
+  enabled: false
+
+externalDatabase:
+  type: pgsql
+  host: REPLACE_EXT_POSTGRES_RW_HOST
+  port: 5432
+  user: moodle
+  database: moodle
+  existingSecret: moodle-externaldb
+
+volumePermissions:
+  enabled: true
+
+persistence:
+  enabled: true
+  existingClaim: REPLACE_MOODLE_DATA_CLAIM
+
+metrics:
+  enabled: false
+
+extraEnvVars:
+  - name: MOODLE_HOST
+    value: https://learn-lms.example.invalid
+
+# Secret contract
+# - `moodle-admin` must contain:
+#   - `moodle-password`
+#   - optional `smtp-password`
+# - `moodle-externaldb` must contain:
+#   - `mariadb-password`
+#
 # Anti-drift
-# - Moodle production state must be externalized: PostgreSQL + object storage for moodledata.
-# - Do not reuse the Learn OIDC client for Moodle; use a dedicated confidential client.
-# - Do not let generic authentication imply course access; access must come from explicit Academy entitlements.
-# - Treat accessSync as a required integration contract; the reconciler implementation is not shipped yet in this repo.
+# - Bitnami chart image verification must be relaxed because the chosen path uses a custom pre-baked image.
+# - `mariadb-password` is the Bitnami chart key name even when `externalDatabase.type=pgsql`.
+# - `persistence.existingClaim` is the current chart bridge for Moodle file state.
+# - Do not treat the claim-backed data path as the final object-storage solution.
