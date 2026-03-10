@@ -1,0 +1,12 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../base
+patches:
+  - target:
+      kind: Application
+      name: platform-secret-stores
+    patch: |-
+      - op: replace
+        path: /spec/source/path
+        value: apps/platform/secret-stores/manifests/overlays/onprem

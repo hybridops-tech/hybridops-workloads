@@ -17,8 +17,12 @@ validate:onprem-stage1:
   script:
     - ./scripts/validate.sh --strict --target onprem-stage1
 
+validate:burst:
+  stage: validate
+  script:
+    - ./scripts/validate.sh --strict --target burst
+
 validate:onprem:
   stage: validate
   script:
     - ./scripts/validate.sh --target onprem
-

@@ -1,6 +1,6 @@
 {
-  "clientId": "hyops-moodle",
-  "name": "HybridOps Moodle",
+  "clientId": "academy-moodle",
+  "name": "Academy Moodle",
   "protocol": "openid-connect",
   "publicClient": false,
   "secret": "REPLACE_CLIENT_SECRET_OUTSIDE_GIT",

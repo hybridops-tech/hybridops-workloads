@@ -36,6 +36,9 @@ Notes:
   - Guide: `docs/onprem-stage1-rollout.md`
 - `clusters/onprem`
   - Status: broader catalog target with additional substitutions still expected
+- `clusters/burst`
+  - Status: first stateless burst target
+  - Guide: `docs/burst-rollout.md`
 
 ## Validation
 
@@ -61,4 +64,3 @@ Notes:
 - `CATALOG.md`
 - `docs/environments.md`
 - `docs/argocd-model.md`
-

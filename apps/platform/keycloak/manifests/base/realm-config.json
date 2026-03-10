@@ -34,8 +34,8 @@
   "refreshTokenMaxReuse": 0,
   "clients": [
     {
-      "clientId": "hyops-learn",
-      "name": "HybridOps Learn",
+      "clientId": "academy-web",
+      "name": "Academy Web",
       "description": "PKCE OIDC client for learn.example.invalid",
       "enabled": true,
       "protocol": "openid-connect",
@@ -58,6 +58,52 @@
       "webOrigins": [
         "https://learn.example.invalid"
       ],
+      "notBefore": 0,
+      "bearerOnly": false,
+      "consentRequired": false,
+      "fullScopeAllowed": false,
+      "nodeReRegistrationTimeout": -1,
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    },
+    {
+      "clientId": "academy-moodle",
+      "name": "Academy Moodle",
+      "description": "Confidential OIDC client for learn-lms.example.invalid",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "$(env:KEYCLOAK_MOODLE_CLIENT_SECRET)",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "authorizationServicesEnabled": false,
+      "frontchannelLogout": true,
+      "attributes": {
+        "post.logout.redirect.uris": "https://learn.example.invalid/learn/academy",
+        "client.session.idle.timeout": "0",
+        "client.session.max.lifespan": "0"
+      },
+      "redirectUris": [
+        "https://learn-lms.example.invalid/admin/oauth2callback.php"
+      ],
+      "webOrigins": [
+        "https://learn-lms.example.invalid"
+      ],
+      "rootUrl": "https://learn-lms.example.invalid/",
+      "baseUrl": "https://learn-lms.example.invalid/",
       "notBefore": 0,
       "bearerOnly": false,
       "consentRequired": false,

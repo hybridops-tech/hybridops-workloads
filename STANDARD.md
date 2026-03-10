@@ -43,6 +43,6 @@ Before publishing a change here, ask:
 1. Can a customer consume this with their own repo URL, cluster, and domains?
 2. Does this describe the product baseline rather than one internal deployment?
 3. Would this still make sense if HybridOps changed its own hosting strategy?
+4. Would this still be valid if the internal overlay were completely removed from the export?
 
 If the answer is no, the material does not belong in the public repo.
-
