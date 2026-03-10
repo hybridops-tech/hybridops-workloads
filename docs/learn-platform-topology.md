@@ -98,15 +98,16 @@ This means:
 ### Stage-2 rollout order
 
 1. stand up `education/moodle`
-2. confirm external PostgreSQL and object storage
-3. configure Keycloak SSO for Moodle
-4. create one course per canonical Academy track
-5. set `ACADEMY_LMS_BASE_URL` in Learn runtime
-6. validate member launch from:
+2. generate/render Moodle secrets from the HyOps runtime vault bundle
+3. confirm external PostgreSQL and object storage
+4. configure Keycloak SSO for Moodle
+5. create one course per canonical Academy track
+6. set `ACADEMY_LMS_BASE_URL` in Learn runtime
+7. validate member launch from:
    - Academy workspace
    - Account page
    - track outline page
-7. verify fallback behavior with `ACADEMY_LMS_BASE_URL` unset
+8. verify fallback behavior with `ACADEMY_LMS_BASE_URL` unset
 
 ## Argo CD Workloads (Stage 1 Minimum)
 

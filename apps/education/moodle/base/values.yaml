@@ -35,7 +35,7 @@ moodleSkipInstall: false
 moodleSiteName: HybridOps Academy
 moodleUsername: admin
 moodleEmail: academy@example.invalid
-existingSecret: moodle-admin
+existingSecret: education-moodle-secrets
 
 service:
   type: ClusterIP
@@ -57,7 +57,7 @@ externalDatabase:
   port: 5432
   user: moodle
   database: moodle
-  existingSecret: moodle-externaldb
+  existingSecret: education-moodle-secrets
 
 volumePermissions:
   enabled: true
@@ -74,14 +74,27 @@ extraEnvVars:
     value: https://learn-lms.example.invalid
 
 # Secret contract
-# - `moodle-admin` must contain:
+# - Use one Kubernetes secret only: `education-moodle-secrets`
+# - Required chart keys inside that secret:
 #   - `moodle-password`
-#   - optional `smtp-password`
-# - `moodle-externaldb` must contain:
 #   - `mariadb-password`
+# - Optional chart key:
+#   - `smtp-password`
+# - Optional extra key for later OIDC/plugin wiring:
+#   - `oidc-client-secret`
+#
+# Runtime-vault contract
+# - Do not hand-author these values in Git.
+# - Generate/persist them with `hyops secrets ...` under env-style keys:
+#   - `MOODLE_ADMIN_PASSWORD`
+#   - `MOODLE_DB_PASSWORD`
+#   - `MOODLE_OIDC_CLIENT_SECRET`
+#   - optional `MOODLE_SMTP_PASSWORD`
 #
 # Anti-drift
 # - Bitnami chart image verification must be relaxed because the chosen path uses a custom pre-baked image.
 # - `mariadb-password` is the Bitnami chart key name even when `externalDatabase.type=pgsql`.
+# - The single-secret model is intentional: admin, SMTP, and external DB password must not drift into separate
+#   handwritten Kubernetes secrets.
 # - `persistence.existingClaim` is the current chart bridge for Moodle file state.
 # - Do not treat the claim-backed data path as the final object-storage solution.

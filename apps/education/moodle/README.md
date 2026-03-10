@@ -24,6 +24,50 @@ Production state rule
 - Do not use chart-managed database state for production.
 - Do not use default chart-created PVCs as the authoritative production `moodledata` path.
 
+Secrets contract
+
+Authority
+- Secret values come from the HyOps runtime vault bundle, not from handwritten Kubernetes Secret YAML kept in Git.
+- The Kubernetes workload consumes one rendered Secret only:
+  - `education-moodle-secrets`
+
+Runtime-vault env keys
+- Required:
+  - `MOODLE_ADMIN_PASSWORD`
+  - `MOODLE_DB_PASSWORD`
+  - `MOODLE_OIDC_CLIENT_SECRET`
+- Optional:
+  - `MOODLE_SMTP_PASSWORD`
+
+HyOps generation/persistence pattern
+- Generate missing values with `hyops secrets ensure --env <env> ...`
+- Read current values with `hyops secrets show --env <env> ...`
+- If your authority is external (HashiCorp Vault, GSM, AKV), sync into the runtime vault first; do not bypass the runtime-vault contract for this workload.
+
+Rendered Kubernetes Secret shape
+- Secret name: `education-moodle-secrets`
+- Required keys:
+  - `moodle-password`
+  - `mariadb-password`
+- Optional keys:
+  - `smtp-password`
+  - `oidc-client-secret`
+
+Anti-drift rule
+- Do not split admin password, SMTP password, and external DB password across multiple handwritten Kubernetes secrets.
+- One rendered bundle is the contract unless the chart itself forces a different model.
+
+External database contract
+- Moodle follows the same externalized PostgreSQL approach as Keycloak.
+- Use the read-write endpoint published by `platform/postgresql-ha`.
+- Preferred source:
+  - state output `endpoint_target`
+- Fallback compatibility outputs:
+  - `cluster_vip`
+  - `db_host`
+  - `pg_host`
+- Do not point Moodle at a cluster member IP directly unless you are debugging a broken HA endpoint.
+
 Authoritative config surface
 - `base/values.yaml`
 - `base/keycloak-client.template.json`
