@@ -19,7 +19,7 @@ spec:
     targetRevision: 2.1.0
     helm:
       values: |
-        installCRDs: true
+        installCRDs: false
   syncPolicy:
     automated:
       prune: true
