@@ -20,7 +20,12 @@ Required secret
   - `KEYCLOAK_ADMIN`
   - `KEYCLOAK_ADMIN_PASSWORD`
   - `KEYCLOAK_EVENTS_SHARED_SECRET`
+  - `KEYCLOAK_MOODLE_CLIENT_SECRET`
   - `KEYCLOAK_LOGIN_THEME` (`keycloak` default, set `hybridops` when your Keycloakify jar is installed)
+
+On-prem secret source
+- Prefer an `ExternalSecret` in the cluster overlay that projects `platform-keycloak-secrets` from `gcp-secret-manager`.
+- The secret values remain external; Git stores only the `ExternalSecret` definition.
 
 Optional secret
 - `platform-keycloak-theme`
@@ -47,7 +52,7 @@ Notes
   - `kubectl -n keycloak create job --from=cronjob/platform-keycloak-realm-sync platform-keycloak-realm-sync-manual-$(date +%s)`
 - `realm-config.json` enables `ext-event-http` to post signed events to:
   - `http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak`
-- The current stage-1 realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
+- The current stage-1 realm uses the `academy-web` public PKCE client and the `learn_member` / `learn_admin` realm roles.
 - In the explicit entitlement model, `learn_member` is treated as an Academy convenience role only; docs and Copilot authorization should read explicit entitlements (`docs_paid*`, `copilot_paid`) instead.
 - Keep the Keycloak database outside the cluster so the workload can be rebuilt without losing identity state.
 

@@ -18,6 +18,17 @@ global:
 
 fullnameOverride: education-moodle
 
+hyops:
+  secretStoreName: gcp-secret-manager
+  moodle:
+    secretName: education-moodle-secrets
+    secretRefreshInterval: 5m
+    gsmKeys:
+      adminPassword: REPLACE_GSM_SECRET_MOODLE_ADMIN_PASSWORD
+      dbPassword: REPLACE_GSM_SECRET_MOODLE_DB_PASSWORD
+      oidcClientSecret: REPLACE_GSM_SECRET_MOODLE_OIDC_CLIENT_SECRET
+      smtpPassword: ""
+
 image:
   registry: REPLACE_IMAGE_REGISTRY
   repository: REPLACE_PREBAKED_MOODLE_IMAGE_REPOSITORY
@@ -73,6 +84,38 @@ extraEnvVars:
   - name: MOODLE_HOST
     value: https://learn-lms.example.invalid
 
+extraDeploy:
+  - |
+    apiVersion: external-secrets.io/v1
+    kind: ExternalSecret
+    metadata:
+      name: {{ .Values.hyops.moodle.secretName }}
+      namespace: {{ .Release.Namespace }}
+    spec:
+      refreshPolicy: Periodic
+      refreshInterval: {{ .Values.hyops.moodle.secretRefreshInterval | quote }}
+      secretStoreRef:
+        name: {{ .Values.hyops.secretStoreName }}
+        kind: ClusterSecretStore
+      target:
+        name: {{ .Values.hyops.moodle.secretName }}
+        creationPolicy: Owner
+      data:
+        - secretKey: moodle-password
+          remoteRef:
+            key: {{ .Values.hyops.moodle.gsmKeys.adminPassword | quote }}
+        - secretKey: mariadb-password
+          remoteRef:
+            key: {{ .Values.hyops.moodle.gsmKeys.dbPassword | quote }}
+        - secretKey: oidc-client-secret
+          remoteRef:
+            key: {{ .Values.hyops.moodle.gsmKeys.oidcClientSecret | quote }}
+        {{- if .Values.hyops.moodle.gsmKeys.smtpPassword }}
+        - secretKey: smtp-password
+          remoteRef:
+            key: {{ .Values.hyops.moodle.gsmKeys.smtpPassword | quote }}
+        {{- end }}
+
 # Secret contract
 # - Use one Kubernetes secret only: `education-moodle-secrets`
 # - Required chart keys inside that secret:
@@ -96,5 +139,7 @@ extraEnvVars:
 # - `mariadb-password` is the Bitnami chart key name even when `externalDatabase.type=pgsql`.
 # - The single-secret model is intentional: admin, SMTP, and external DB password must not drift into separate
 #   handwritten Kubernetes secrets.
+# - The workload consumes the single secret name `education-moodle-secrets`, but that secret should be created by
+#   ESO from the external secret backend rather than by a hand-authored Secret manifest.
 # - `persistence.existingClaim` is the current chart bridge for Moodle file state.
 # - Do not treat the claim-backed data path as the final object-storage solution.

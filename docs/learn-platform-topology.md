@@ -97,17 +97,18 @@ This means:
 
 ### Stage-2 rollout order
 
-1. stand up `education/moodle`
-2. generate/render Moodle secrets from the HyOps runtime vault bundle
+1. bootstrap `gsm-sa-credentials` and reconcile `platform/external-secrets` + `platform/secret-stores`
+2. persist Moodle secrets from the HyOps runtime vault bundle into GCP Secret Manager
 3. confirm external PostgreSQL and object storage
-4. configure Keycloak SSO for Moodle
-5. create one course per canonical Academy track
-6. set `ACADEMY_LMS_BASE_URL` in Learn runtime
-7. validate member launch from:
+4. stand up `education/moodle`
+5. configure Keycloak SSO for Moodle
+6. create one course per canonical Academy track
+7. set `ACADEMY_LMS_BASE_URL` in Learn runtime
+8. validate member launch from:
    - Academy workspace
    - Account page
    - track outline page
-8. verify fallback behavior with `ACADEMY_LMS_BASE_URL` unset
+9. verify fallback behavior with `ACADEMY_LMS_BASE_URL` unset
 
 ## Argo CD Workloads (Stage 1 Minimum)
 
@@ -116,6 +117,10 @@ Enable in the low-cost hybrid target:
 - `platform/entitlements-api`
 - `academy/website`
 - `studio/docsgpt` only if you later choose a self-hosted Copilot API instead of the Cloudflare Worker
+
+On-prem platform baseline for secret-backed workloads:
+- `platform/external-secrets`
+- `platform/secret-stores`
 
 ## Anti-Drift Rules
 

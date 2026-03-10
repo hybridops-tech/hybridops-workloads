@@ -1,4 +1,6 @@
 apps:
+  - platform/external-secrets
+  - platform/secret-stores
   - platform/keycloak
   - platform/entitlements-api
   - platform/velero

@@ -5,6 +5,7 @@
 - `clusters/onprem-smoke` (smoke proof)
 - `clusters/onprem-stage1` (guestbook + velero + loki baseline)
 - `clusters/onprem` (full on-prem app catalog)
+- `clusters/burst` (guestbook + academy website stateless burst baseline)
 
 ## App catalog
 
@@ -18,5 +19,5 @@
 - business/nextcloud (draft)
 - business/zammad (draft)
 - education/moodle (stage2 chart pinned, image strategy defined)
-- academy/website (draft)
+- academy/website (onprem and burst ready)
 - studio/docsgpt (draft)

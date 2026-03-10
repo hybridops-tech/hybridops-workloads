@@ -39,4 +39,5 @@ Notes
 - The app serves the full Astro site bundle, but this workload is intended for the Learn surface.
 - Keep the product/docs static surfaces outside the cluster unless you explicitly choose otherwise.
 - This app is typically composed into a Learn integration target when SSR routes and middleware are required.
+- Current overlays cover `onprem`, `edge-hetzner`, and the first stateless `burst` target.
 - If you use a private runtime renderer or secret-generation flow, keep that helper outside the public workload contract.
