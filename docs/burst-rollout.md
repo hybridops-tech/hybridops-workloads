@@ -17,19 +17,18 @@ The first public burst target is intentionally narrow:
 ## Current burst app set
 
 1. `smoke/guestbook`
-2. `academy/website`
 
 ## Why this set
 
 - `smoke/guestbook` proves Argo CD, namespace creation, sync, and rollback with a minimal app.
-- `academy/website` proves a real stateless application can be re-established in a burst cluster without placing authoritative state inside Kubernetes.
 
 ## Not included yet
 
 The first burst target does not yet include:
 
+- `academy/website`
 - `observability/kube-prometheus-stack`
 - `observability/thanos-compactor`
 - `studio/docsgpt`
 
-Those are follow-on promotions once the target cluster and endpoint contracts are fully pinned.
+Those are follow-on promotions once the target cluster and endpoint contracts are fully pinned. `academy/website` in particular still depends on a generated runtime payload secret and platform secret inputs that are not yet part of the first public burst baseline.
