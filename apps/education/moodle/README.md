@@ -27,9 +27,10 @@ Production state rule
 Secrets contract
 
 Authority
-- Secret values come from the HyOps runtime vault bundle, not from handwritten Kubernetes Secret YAML kept in Git.
-- The Kubernetes workload consumes one rendered Secret only:
+- Secret values come from the HyOps runtime vault bundle and external secret authority, not from handwritten Kubernetes Secret YAML kept in Git.
+- In steady state, the Kubernetes workload consumes one Secret projected by External Secrets Operator:
   - `education-moodle-secrets`
+- The runtime vault is the controller-side seed/cache used to generate or sync the required values before they are persisted to the external authority.
 
 Runtime-vault env keys
 - Required:
@@ -42,9 +43,11 @@ Runtime-vault env keys
 HyOps generation/persistence pattern
 - Generate missing values with `hyops secrets ensure --env <env> ...`
 - Read current values with `hyops secrets show --env <env> ...`
+- Persist the Moodle values into the selected external authority before cluster bring-up:
+  - preferred on-prem path: `hyops secrets gsm-persist --env <env> --scope education`
 - If your authority is external (HashiCorp Vault, GSM, AKV), sync into the runtime vault first; do not bypass the runtime-vault contract for this workload.
 
-Rendered Kubernetes Secret shape
+Projected Kubernetes Secret shape
 - Secret name: `education-moodle-secrets`
 - Required keys:
   - `moodle-password`
@@ -55,7 +58,8 @@ Rendered Kubernetes Secret shape
 
 Anti-drift rule
 - Do not split admin password, SMTP password, and external DB password across multiple handwritten Kubernetes secrets.
-- One rendered bundle is the contract unless the chart itself forces a different model.
+- One target secret name is the contract unless the chart itself forces a different model.
+- The steady-state cluster object must be reconciled by ESO, not by a hand-applied secret manifest.
 
 External database contract
 - Moodle follows the same externalized PostgreSQL approach as Keycloak.
@@ -67,6 +71,16 @@ External database contract
   - `db_host`
   - `pg_host`
 - Do not point Moodle at a cluster member IP directly unless you are debugging a broken HA endpoint.
+
+ESO contract
+- Backend: GCP Secret Manager on the on-prem platform path, per ADR-0504
+- Store ref: `gcp-secret-manager`
+- Moodle chart values embed an `ExternalSecret` via `extraDeploy` so the chart release and the projected secret stay coupled
+- The Moodle `ExternalSecret` must map:
+  - `moodle-password` <- `MOODLE_ADMIN_PASSWORD`
+  - `mariadb-password` <- `MOODLE_DB_PASSWORD`
+  - `oidc-client-secret` <- `MOODLE_OIDC_CLIENT_SECRET`
+  - optional `smtp-password` <- `MOODLE_SMTP_PASSWORD`
 
 Authoritative config surface
 - `base/values.yaml`
@@ -91,7 +105,7 @@ Moodle side
   - do not make custom username-claim mapping part of the base contract until it is tested end to end
 
 Keycloak side
-- Client ID: `hyops-moodle`
+- Client ID: `academy-moodle`
 - Access type: confidential client
 - Standard flow: enabled
 - Direct access grants: disabled
@@ -102,7 +116,7 @@ Keycloak side
 - Template: `base/keycloak-client.template.json`
 
 Anti-drift rule
-- Do not reuse the Learn client (`hyops-learn`) for Moodle.
+- Do not reuse the Academy web client (`academy-web`) for Moodle.
 - Learn and Moodle are different relying parties with different redirect and logout behavior.
 
 Plugin packaging contract
@@ -159,7 +173,7 @@ Bring-up order
 1. Set the overlay host and TLS settings.
 2. Build and publish the pre-baked Moodle image with `auth_oidc`.
 3. Wire external PostgreSQL and the pre-provisioned data claim.
-4. Create the Keycloak `hyops-moodle` client from the tracked template.
+4. Create the Keycloak `academy-moodle` client from the tracked template.
 5. Configure the Moodle OIDC service and claim mappings.
 6. Create one Moodle course per canonical track shortname.
 7. Wire the Entitlements API token and enrollment sync path.

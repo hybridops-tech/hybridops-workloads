@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # purpose: Lightweight validation for workload repo hygiene and cluster app wiring.
-# maintainer: HybridOps.Studio
+# maintainer: HybridOps.Tech
 
 if [ -z "${BASH_VERSION:-}" ]; then
   exec bash "$0" "$@"

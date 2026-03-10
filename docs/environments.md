@@ -22,4 +22,5 @@ layers and are not encoded in workload paths.
 Notes:
 
 - Edge services are deployment-specific and are not implied by this repo alone.
-
+- The first public burst target is intentionally stateless: `smoke/guestbook` plus `academy/website`.
+- Remote-write, object-store, and broader platform app promotion can be layered onto burst after the target cluster contract is stable.
