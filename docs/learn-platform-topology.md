@@ -122,6 +122,14 @@ On-prem platform baseline for secret-backed workloads:
 - `platform/external-secrets`
 - `platform/secret-stores`
 
+On-prem secret delivery rule
+- Bootstrap `platform/external-secrets` and `platform/secret-stores` before moving Stage 1 workloads onto `ExternalSecret` delivery.
+- For the current Learn/Auth deployment, Keycloak now follows:
+  - runtime vault
+  - GCP Secret Manager
+  - `ExternalSecret`
+- Do not revert Keycloak to a manually curated long-lived cluster `Secret` unless you are in break-glass recovery.
+
 ## Anti-Drift Rules
 
 - Do not add cluster-local databases for auth, entitlements, or Moodle production data.

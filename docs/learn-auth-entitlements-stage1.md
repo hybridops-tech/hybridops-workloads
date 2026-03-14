@@ -59,7 +59,8 @@ Hosts
 - `docs.hybridops.tech` (public docs + Copilot)
 
 Clients (initial)
-- `academy-web` (public PKCE client for the Learn surface)
+- `hyops-learn` in the current internal Learn Stage 1 rollout (public PKCE client for the Learn surface)
+- a public baseline may choose a different client ID, but the client remains overlay-defined rather than hardcoded into the Stage 1 contract
 - `hyops-docs` (public or BFF-backed; depends on final login UX for the docs host)
 - `hyops-entitlements-api` (confidential, optional for service-level calls)
 
