@@ -8,7 +8,7 @@ Runtime contract
 - Namespace: `academy`
 - Service: `academy-website`
 - Ingress host: overlay-defined
-- Runtime model: public `node:22-slim` base image plus generated `academy-website-runtime` Secret payload
+- Runtime model: public `node:22-slim` base image plus `academy-website-runtime` synced by `platform/k8s/runtime-bundle-secret`
 
 Required secret
 - `academy-website-secrets`
@@ -17,7 +17,8 @@ Required secret
   - `ENTITLEMENTS_API_TOKEN`
   - `STRIPE_SECRET_KEY`
 - `academy-website-runtime`
-  - generated bundle containing `dist/`, `package.json`, and `package-lock.json`
+  - runtime bundle containing `dist/`, `package.json`, and `package-lock.json`
+  - normative sync path: `platform/k8s/runtime-bundle-secret`
 
 On-prem secret source
 - For long-lived application credentials, the normative path is:
