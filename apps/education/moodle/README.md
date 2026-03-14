@@ -18,6 +18,7 @@ Runtime contract
 - Database: external PostgreSQL read-write endpoint
 - DR database endpoint: optional read-only replica
 - Runtime image: pre-baked custom image derived from the pinned `docker.io/bitnamilegacy/moodle:5.0.2-debian-12-r2` base
+- Volume-permissions init image: pinned `docker.io/bitnamilegacy/os-shell:12-debian-12-r50`
 - File state bridge: pre-provisioned claim via `persistence.existingClaim`
 - First live bring-up target: internal bootstrap target only, not the future full Stage 2 root
 
@@ -135,6 +136,9 @@ Plugin packaging contract
   - `image/Dockerfile`
 - Chart interaction:
   - `global.security.allowInsecureImages=true` is required because the chosen image is custom, not stock Bitnami
+- Chart compatibility bridge:
+  - the current Moodle chart line still points its `volumePermissions` init container at a removed `bitnami/os-shell` tag
+  - override it to `bitnamilegacy/os-shell:12-debian-12-r50` until the chart line catches up
 - Do not depend on ad hoc web-admin plugin installation as the production path.
 
 Enrollment sync contract
