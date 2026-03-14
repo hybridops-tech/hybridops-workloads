@@ -124,7 +124,7 @@ Plugin packaging contract
 - Chosen delivery model:
   - pre-baked Moodle image with the plugin installed
 - Tracked image scaffold:
-  - `image/Dockerfile.template`
+  - `image/Dockerfile`
 - Chart interaction:
   - `global.security.allowInsecureImages=true` is required because the chosen image is custom, not stock Bitnami
 - Do not depend on ad hoc web-admin plugin installation as the production path.

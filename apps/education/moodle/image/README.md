@@ -3,30 +3,29 @@
 Chosen approach
 - Pre-baked custom image derived from the pinned Bitnami Moodle base image.
 
-Base image
-- `docker.io/bitnami/moodle:5.0.2-debian-12-r1`
-
-Required addition
-- Moodle OpenID Connect plugin: `auth_oidc`
+Pinned source
+- Base image: `docker.io/bitnami/moodle:5.0.2-debian-12-r1`
+- Plugin source: Microsoft `o365-moodle` tag `v20251223_m500`
+- Plugin path copied into the image: `auth/oidc`
 
 Why this approach
 - avoids manual plugin installation through the Moodle admin UI
 - keeps the runtime reproducible
-- matches the GitOps deployment model used for the rest of the workload repo
+- keeps the plugin source and version reviewable in Git
 
-What the image must contain
-- the upstream Bitnami Moodle runtime
-- `auth_oidc` present before first boot
-- no interactive setup steps required to enable the plugin files
+Authoritative build file
+- `apps/education/moodle/image/Dockerfile`
 
 Expected publish contract
-- publish the built image to your registry
-- set in `apps/education/moodle/base/values.yaml`:
+- Publish the image through your standard image pipeline.
+- Set in the workload values:
   - `image.registry`
   - `image.repository`
   - `image.tag`
+- A tested reference tag for the current maintained lane is:
+  - `5.0.2-debian-12-r1-oidc-v20251223_m500-r1`
 
-Important note
-- This repo records the image packaging strategy and values contract.
-- It does not yet ship a final build pipeline for the Moodle custom image.
-- Build the image only after the exact plugin source/version is chosen and tested against the pinned Bitnami base image.
+Anti-drift rules
+- Do not revert to manual plugin installation in the Moodle admin UI.
+- Do not change the Bitnami base tag without retesting the pinned `auth_oidc` source.
+- Do not change the published image name or tag convention without updating the workload values that consume it.
