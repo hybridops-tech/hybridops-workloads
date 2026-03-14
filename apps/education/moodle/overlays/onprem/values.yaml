@@ -1,5 +1,4 @@
-# Onprem overrides (draft)
-hyops:
-  env: onprem
-  ingress:
-    host: learn-lms.example.invalid
+# Generic on-prem defaults.
+# Concrete internal host, image, and storage values belong in the internal Stage 2 overlay.
+ingress:
+  ingressClassName: nginx
