@@ -17,7 +17,7 @@ Runtime contract
 - Ingress host: overlay-defined, recommended pattern `learn-lms.<domain>`
 - Database: external PostgreSQL read-write endpoint
 - DR database endpoint: optional read-only replica
-- Runtime image: pre-baked custom image derived from `docker.io/bitnami/moodle:5.0.2-debian-12-r1`
+- Runtime image: pre-baked custom image derived from the pinned `docker.io/bitnamilegacy/moodle:5.0.2-debian-12-r2` base
 - File state bridge: pre-provisioned claim via `persistence.existingClaim`
 
 Production state rule
