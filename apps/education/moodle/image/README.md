@@ -25,7 +25,7 @@ Expected publish contract
   - `image.repository`
   - `image.tag`
 - A tested reference tag for the current maintained lane is:
-  - `5.0.2-debian-12-r1-oidc-v20251223_m500-r1`
+  - `5.0.2-debian-12-r2-oidc-v20251223_m500-r1`
 
 Anti-drift rules
 - Do not revert to manual plugin installation in the Moodle admin UI.
