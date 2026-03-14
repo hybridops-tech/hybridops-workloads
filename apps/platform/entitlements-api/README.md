@@ -16,7 +16,7 @@ Runtime contract
 - Namespace: `entitlements`
 - Service: `platform-entitlements-api`
 - Ingress host: overlay-defined
-- Runtime model: public `node:22-alpine` base image plus generated `platform-entitlements-api-runtime` Secret payload
+- Runtime model: public `node:22-alpine` base image plus `platform-entitlements-api-runtime` synced by `platform/k8s/runtime-bundle-secret`
 - External DB: PostgreSQL remains outside the cluster
 
 Required secret
@@ -29,7 +29,8 @@ Required secret
   - `STRIPE_WEBHOOK_SECRET`
   - `KEYCLOAK_EVENTS_SHARED_SECRET` (required when Keycloak event webhook verification is enabled)
 - `platform-entitlements-api-runtime`
-  - generated source bundle containing `package.json`, `src/`, and `sql/`
+  - runtime bundle containing `package.json`, `src/`, and `sql/`
+  - normative sync path: `platform/k8s/runtime-bundle-secret`
 
 Optional secret overrides
 - `platform-entitlements-api-secrets`
