@@ -19,6 +19,7 @@ Runtime contract
 - DR database endpoint: optional read-only replica
 - Runtime image: pre-baked custom image derived from the pinned `docker.io/bitnamilegacy/moodle:5.0.2-debian-12-r2` base
 - File state bridge: pre-provisioned claim via `persistence.existingClaim`
+- First live bring-up target: internal bootstrap target only, not the future full Stage 2 root
 
 Production state rule
 - Do not use chart-managed database state for production.
@@ -86,6 +87,13 @@ Authoritative config surface
 - `base/values.yaml`
 - `base/keycloak-client.template.json`
 - `image/README.md`
+
+Image pull contract
+- If the published image is public, the chart may pull it anonymously.
+- If the published image is private, set either:
+  - `global.imagePullSecrets`
+  - or `image.pullSecrets`
+- Do not rely on undocumented package visibility or manual node-level registry login.
 
 SSO contract
 
@@ -179,6 +187,10 @@ Bring-up order
 7. Wire the Entitlements API token and enrollment sync path.
 8. Set `ACADEMY_LMS_BASE_URL` in Learn runtime.
 9. Validate member launch from Learn workspace, account page, and track detail pages.
+
+Bootstrap note
+- The first live deployment should use a Moodle-only internal bootstrap target.
+- Do not replace the current Stage 1 root with the future full Stage 2 root until the Moodle lane is validated.
 
 Launch contract with Learn
 - Learn keeps public discovery and purchase UX.

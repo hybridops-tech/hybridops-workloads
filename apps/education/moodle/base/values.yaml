@@ -1,4 +1,5 @@
 global:
+  imagePullSecrets: []
   security:
     allowInsecureImages: true
 
@@ -136,6 +137,7 @@ extraDeploy:
 #
 # Anti-drift
 # - Bitnami chart image verification must be relaxed because the chosen path uses a custom pre-baked image.
+# - If the published image is private, declare `global.imagePullSecrets` or `image.pullSecrets` explicitly.
 # - `mariadb-password` is the Bitnami chart key name even when `externalDatabase.type=pgsql`.
 # - The single-secret model is intentional: admin, SMTP, and external DB password must not drift into separate
 #   handwritten Kubernetes secrets.

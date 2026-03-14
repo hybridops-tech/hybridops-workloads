@@ -24,6 +24,7 @@ Expected publish contract
   - `image.registry`
   - `image.repository`
   - `image.tag`
+- If the package remains private, declare a registry pull secret in the consuming overlay.
 - A tested reference tag for the current maintained lane is:
   - `5.0.2-debian-12-r2-oidc-v20251223_m500-r1`
 
