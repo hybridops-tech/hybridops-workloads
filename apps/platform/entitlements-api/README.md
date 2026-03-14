@@ -21,11 +21,11 @@ Runtime contract
 
 Required secret
 - `platform-entitlements-api-secrets`
-  - `DATABASE_HOST`
-  - `DATABASE_USER`
+  - projected by `ExternalSecret` from `gcp-secret-manager` in the internal on-prem target
   - `DATABASE_PASSWORD`
   - `INTERNAL_API_TOKEN`
   - `STRIPE_SECRET_KEY`
+    - Stage 1 uses the same Stripe secret as the Academy website checkout path.
   - `STRIPE_WEBHOOK_SECRET`
   - `KEYCLOAK_EVENTS_SHARED_SECRET` (required when Keycloak event webhook verification is enabled)
 - `platform-entitlements-api-runtime`
@@ -41,11 +41,20 @@ Optional secret overrides
   - `KEYCLOAK_SYNC_POLL_INTERVAL_MS`
   - `KEYCLOAK_SYNC_MAX_ATTEMPTS`
 
+On-prem secret source
+- For long-lived application credentials, the normative path is:
+  - runtime vault
+  - GCP Secret Manager
+  - `ExternalSecret`
+- Treat hand-applied long-lived copies of `platform-entitlements-api-secrets` as break-glass only.
+
 Non-secret config
 - `platform-entitlements-api-env` ConfigMap is generated from manifests and sets:
   - `PORT=8080`
   - `NODE_ENV=production`
   - `LOG_LEVEL=info`
+  - `DATABASE_HOST` (set by overlay)
+  - `DATABASE_USER` (set by overlay)
   - `DATABASE_NAME=hyops_entitlements`
   - `DATABASE_PORT=5432`
   - `DATABASE_SSLMODE=require`
