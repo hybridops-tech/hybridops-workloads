@@ -26,7 +26,7 @@ hyops:
     gsmKeys:
       adminPassword: REPLACE_GSM_SECRET_MOODLE_ADMIN_PASSWORD
       dbPassword: REPLACE_GSM_SECRET_MOODLE_DB_PASSWORD
-      oidcClientSecret: REPLACE_GSM_SECRET_MOODLE_OIDC_CLIENT_SECRET
+      oidcClientSecret: REPLACE_GSM_SECRET_KEYCLOAK_MOODLE_CLIENT_SECRET
       smtpPassword: ""
 
 image:
@@ -131,7 +131,7 @@ extraDeploy:
 # - Generate/persist them with `hyops secrets ...` under env-style keys:
 #   - `MOODLE_ADMIN_PASSWORD`
 #   - `MOODLE_DB_PASSWORD`
-#   - `MOODLE_OIDC_CLIENT_SECRET`
+#   - `KEYCLOAK_MOODLE_CLIENT_SECRET`
 #   - optional `MOODLE_SMTP_PASSWORD`
 #
 # Anti-drift
