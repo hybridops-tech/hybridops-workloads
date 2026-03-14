@@ -22,10 +22,19 @@ Required secret
   - `KEYCLOAK_EVENTS_SHARED_SECRET`
   - `KEYCLOAK_MOODLE_CLIENT_SECRET`
   - `KEYCLOAK_LOGIN_THEME` (`keycloak` default, set `hybridops` when your Keycloakify jar is installed)
+  - `KEYCLOAK_GOOGLE_CLIENT_ID` (required when Google brokering is enabled)
+  - `KEYCLOAK_GOOGLE_CLIENT_SECRET` (required when Google brokering is enabled)
+  - `KEYCLOAK_MICROSOFT_CLIENT_ID` (required when Microsoft brokering is enabled)
+  - `KEYCLOAK_MICROSOFT_CLIENT_SECRET` (required when Microsoft brokering is enabled)
 
 On-prem secret source
 - Prefer an `ExternalSecret` in the cluster overlay that projects `platform-keycloak-secrets` from `gcp-secret-manager`.
 - The secret values remain external; Git stores only the `ExternalSecret` definition.
+- For the internal Learn Stage 1 target, the normative path is:
+  - runtime vault
+  - GCP Secret Manager
+  - `ExternalSecret`
+- Treat hand-applied long-lived copies of `platform-keycloak-secrets` as break-glass only.
 
 Optional secret
 - `platform-keycloak-theme`
@@ -48,11 +57,14 @@ Notes
   - `keycloak-events` extension jar (HTTP sender listener)
   - optional `hybridops-theme.jar` from `platform-keycloak-theme`
 - Realm state is reconciled against `realm-config.json` through the in-cluster config-cli jobs.
+- The current internal on-prem overlay also tracks Google and Microsoft identity providers in realm config.
 - To force an immediate sync (outside the cron schedule), run:
   - `kubectl -n keycloak create job --from=cronjob/platform-keycloak-realm-sync platform-keycloak-realm-sync-manual-$(date +%s)`
+- If you change any value that Keycloak consumes through `envFrom`, restart the deployment after the projected secret updates:
+  - `kubectl -n keycloak rollout restart deployment/platform-keycloak`
 - `realm-config.json` enables `ext-event-http` to post signed events to:
   - `http://platform-entitlements-api.entitlements.svc.cluster.local:8080/webhooks/keycloak`
-- The current stage-1 realm uses the `academy-web` public PKCE client and the `learn_member` / `learn_admin` realm roles.
+- The current internal Learn Stage 1 realm uses the `hyops-learn` public PKCE client and the `learn_member` / `learn_admin` realm roles.
 - In the explicit entitlement model, `learn_member` is treated as an Academy convenience role only; docs and Copilot authorization should read explicit entitlements (`docs_paid*`, `copilot_paid`) instead.
 - Keep the Keycloak database outside the cluster so the workload can be rebuilt without losing identity state.
 
