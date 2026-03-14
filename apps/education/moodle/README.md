@@ -36,7 +36,7 @@ Runtime-vault env keys
 - Required:
   - `MOODLE_ADMIN_PASSWORD`
   - `MOODLE_DB_PASSWORD`
-  - `MOODLE_OIDC_CLIENT_SECRET`
+  - `KEYCLOAK_MOODLE_CLIENT_SECRET`
 - Optional:
   - `MOODLE_SMTP_PASSWORD`
 
@@ -79,7 +79,7 @@ ESO contract
 - The Moodle `ExternalSecret` must map:
   - `moodle-password` <- `MOODLE_ADMIN_PASSWORD`
   - `mariadb-password` <- `MOODLE_DB_PASSWORD`
-  - `oidc-client-secret` <- `MOODLE_OIDC_CLIENT_SECRET`
+  - `oidc-client-secret` <- `KEYCLOAK_MOODLE_CLIENT_SECRET`
   - optional `smtp-password` <- `MOODLE_SMTP_PASSWORD`
 
 Authoritative config surface
