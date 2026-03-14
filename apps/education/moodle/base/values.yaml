@@ -73,6 +73,12 @@ externalDatabase:
 
 volumePermissions:
   enabled: true
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/os-shell
+    tag: 12-debian-12-r50
+    pullPolicy: IfNotPresent
+    pullSecrets: []
 
 persistence:
   enabled: true
@@ -138,6 +144,8 @@ extraDeploy:
 # Anti-drift
 # - Bitnami chart image verification must be relaxed because the chosen path uses a custom pre-baked image.
 # - If the published image is private, declare `global.imagePullSecrets` or `image.pullSecrets` explicitly.
+# - The current chart line still references a removed `bitnami/os-shell` init image tag. Pin `volumePermissions.image`
+#   to `bitnamilegacy/os-shell:12-debian-12-r50` until the chart line moves forward.
 # - `mariadb-password` is the Bitnami chart key name even when `externalDatabase.type=pgsql`.
 # - The single-secret model is intentional: admin, SMTP, and external DB password must not drift into separate
 #   handwritten Kubernetes secrets.
