@@ -73,6 +73,36 @@ function sanitizeRegisterMarker(kcContext: KcContext) {
     }
 }
 
+function applySocialProviderLabels() {
+    const socialProviders = document.querySelector<HTMLElement>("#kc-social-providers");
+    if (!socialProviders) {
+        return;
+    }
+
+    const links = socialProviders.querySelectorAll<HTMLAnchorElement>("a");
+
+    for (const link of links) {
+        const label = link.querySelector<HTMLElement>(".kc-social-provider-name, span");
+        if (!label) {
+            continue;
+        }
+
+        const providerName = String(
+            label.dataset.hyopsProviderName || label.textContent || ""
+        )
+            .replace(/^Continue with\s+/i, "")
+            .trim();
+
+        if (!providerName) {
+            continue;
+        }
+
+        label.dataset.hyopsProviderName = providerName;
+        label.textContent = `Continue with ${providerName}`;
+        link.setAttribute("aria-label", `Continue with ${providerName}`);
+    }
+}
+
 function applyInlineInputPlaceholders() {
     const requiredFieldBanner = document.querySelector<HTMLElement>(
         ".kcLabelWrapperClass.subtitle"
@@ -207,6 +237,7 @@ export default function KcPage(props: { kcContext: KcContext }) {
             requestAnimationFrame(() => {
                 isScheduled = false;
                 applyInlineInputPlaceholders();
+                applySocialProviderLabels();
             });
         };
 
