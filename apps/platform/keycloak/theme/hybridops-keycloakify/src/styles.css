@@ -515,6 +515,7 @@ a:hover {
   padding: 0;
   display: grid;
   gap: 10px;
+  justify-items: center;
 }
 
 .kc-social-links > li,
@@ -526,9 +527,10 @@ a:hover {
 a.kc-social-item,
 .kc-social-item,
 #kc-social-providers a {
-  width: 100%;
+  width: min(100%, 248px);
   min-height: 44px;
-  padding: 0 14px;
+  margin-inline: auto;
+  padding: 0 16px;
   border: 1px solid var(--hyops-border);
   border-radius: var(--hyops-radius-btn);
   background: linear-gradient(180deg, #ffffff, var(--hyops-bg-subtle));
@@ -536,7 +538,7 @@ a.kc-social-item,
   color: var(--hyops-text) !important;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   font-family: var(--hyops-font);
   font-size: 14px;
@@ -574,7 +576,7 @@ a.kc-social-item:focus-visible,
 #kc-social-providers a span {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 10px;
   white-space: nowrap;
 }
