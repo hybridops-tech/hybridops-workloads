@@ -89,7 +89,7 @@ metrics:
 
 extraEnvVars:
   - name: MOODLE_HOST
-    value: https://learn-lms.example.invalid
+    value: learn-lms.example.invalid
 
 extraDeploy:
   - |
