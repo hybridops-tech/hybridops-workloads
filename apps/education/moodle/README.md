@@ -15,6 +15,7 @@ Runtime contract
 - Helm chart: Bitnami Moodle `28.0.0`
 - Chart repo: `https://charts.bitnami.com/bitnami`
 - Ingress host: overlay-defined, recommended pattern `learn-lms.<domain>`
+- `MOODLE_HOST`: bare hostname only, no URL scheme
 - Database: external PostgreSQL read-write endpoint
 - DR database endpoint: optional read-only replica
 - Runtime image: pre-baked custom image derived from the pinned `docker.io/bitnamilegacy/moodle:5.0.2-debian-12-r2` base
@@ -95,6 +96,13 @@ Image pull contract
   - `global.imagePullSecrets`
   - or `image.pullSecrets`
 - Do not rely on undocumented package visibility or manual node-level registry login.
+- Current internal Stage 2 bootstrap contract:
+  - secret name: `academy-moodle-ghcr-pull`
+  - secret type: `kubernetes.io/dockerconfigjson`
+  - external secret keys:
+    - `hyops-dev-platform-GHCR_PULL_USERNAME`
+    - `hyops-dev-platform-GHCR_PULL_TOKEN`
+- Keep these registry rows in the env-local GSM allowlist, not the shipped core default map.
 
 SSO contract
 
