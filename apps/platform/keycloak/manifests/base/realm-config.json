@@ -76,52 +76,6 @@
         "offline_access",
         "microprofile-jwt"
       ]
-    },
-    {
-      "clientId": "academy-moodle",
-      "name": "Academy Moodle",
-      "description": "Confidential OIDC client for learn-lms.example.invalid",
-      "enabled": true,
-      "protocol": "openid-connect",
-      "publicClient": false,
-      "secret": "$(env:KEYCLOAK_MOODLE_CLIENT_SECRET)",
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
-      "serviceAccountsEnabled": false,
-      "authorizationServicesEnabled": false,
-      "frontchannelLogout": true,
-      "attributes": {
-        "post.logout.redirect.uris": "https://learn.example.invalid/learn/academy",
-        "client.session.idle.timeout": "0",
-        "client.session.max.lifespan": "0"
-      },
-      "redirectUris": [
-        "https://learn-lms.example.invalid/admin/oauth2callback.php"
-      ],
-      "webOrigins": [
-        "https://learn-lms.example.invalid"
-      ],
-      "rootUrl": "https://learn-lms.example.invalid/",
-      "baseUrl": "https://learn-lms.example.invalid/",
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "fullScopeAllowed": false,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "web-origins",
-        "acr",
-        "profile",
-        "roles",
-        "email"
-      ],
-      "optionalClientScopes": [
-        "address",
-        "phone",
-        "offline_access",
-        "microprofile-jwt"
-      ]
     }
   ],
   "requiredCredentials": [
@@ -169,7 +123,7 @@
     "realm": [
       {
         "name": "learn_member",
-        "description": "Paid member — full academy access",
+        "description": "Paid member \u2014 full academy access",
         "composite": false,
         "clientRole": false
       },

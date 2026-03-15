@@ -20,7 +20,6 @@ Required secret
   - `KEYCLOAK_ADMIN`
   - `KEYCLOAK_ADMIN_PASSWORD`
   - `KEYCLOAK_EVENTS_SHARED_SECRET`
-  - `KEYCLOAK_MOODLE_CLIENT_SECRET`
   - `KEYCLOAK_LOGIN_THEME` (`keycloak` default, set `hybridops` when your Keycloakify jar is installed)
   - `KEYCLOAK_GOOGLE_CLIENT_ID` (required when Google brokering is enabled)
   - `KEYCLOAK_GOOGLE_CLIENT_SECRET` (required when Google brokering is enabled)
@@ -57,7 +56,7 @@ Notes
   - `keycloak-events` extension jar (HTTP sender listener)
   - optional `hybridops-theme.jar` from `platform-keycloak-theme`
 - Realm state is reconciled against `realm-config.json` through the in-cluster config-cli jobs.
-- The current internal on-prem overlay also tracks Google and Microsoft identity providers in realm config.
+- The private on-prem overlay also tracks Google and Microsoft identity providers in realm config, plus additional non-public clients.
 - To force an immediate sync (outside the cron schedule), run:
   - `kubectl -n keycloak create job --from=cronjob/platform-keycloak-realm-sync platform-keycloak-realm-sync-manual-$(date +%s)`
 - If you change any value that Keycloak consumes through `envFrom`, restart the deployment after the projected secret updates:

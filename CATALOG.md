@@ -18,6 +18,5 @@
 - observability/thanos-compactor (draft)
 - business/nextcloud (draft)
 - business/zammad (draft)
-- education/moodle (stage2 chart pinned, image strategy defined)
 - academy/website (onprem and burst ready)
 - studio/docsgpt (draft)
