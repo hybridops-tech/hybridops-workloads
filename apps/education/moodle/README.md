@@ -16,7 +16,8 @@ Runtime contract
 - Chart repo: `https://charts.bitnami.com/bitnami`
 - Ingress host: overlay-defined, recommended pattern `learn-lms.<domain>`
 - `MOODLE_HOST`: bare hostname only, no URL scheme
-- Reverse-proxy mode: enable `MOODLE_REVERSEPROXY=yes` and `MOODLE_SSLPROXY=yes` when TLS terminates at ingress
+- TLS-terminating ingress: enable `MOODLE_SSLPROXY=yes`
+- Do not enable `MOODLE_REVERSEPROXY` when the ingress forwards the public `Host` header
 - Database: external PostgreSQL read-write endpoint
 - DR database endpoint: optional read-only replica
 - Runtime image: pre-baked custom image derived from the pinned `docker.io/bitnamilegacy/moodle:5.0.2-debian-12-r2` base
