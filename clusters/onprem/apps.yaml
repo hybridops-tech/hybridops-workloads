@@ -9,6 +9,5 @@ apps:
   - observability/thanos-compactor
   - business/nextcloud
   - business/zammad
-  - education/moodle
   - academy/website
   - studio/docsgpt

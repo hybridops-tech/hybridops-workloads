@@ -40,11 +40,6 @@ spec:
                     secretKeyRef:
                       name: platform-keycloak-secrets
                       key: KEYCLOAK_LOGIN_THEME
-                - name: KEYCLOAK_MOODLE_CLIENT_SECRET
-                  valueFrom:
-                    secretKeyRef:
-                      name: platform-keycloak-secrets
-                      key: KEYCLOAK_MOODLE_CLIENT_SECRET
                 - name: KEYCLOAK_GOOGLE_CLIENT_ID
                   valueFrom:
                     secretKeyRef:

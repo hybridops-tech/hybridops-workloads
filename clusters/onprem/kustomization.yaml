@@ -11,6 +11,5 @@ resources:
   - ../../apps/observability/thanos-compactor/overlays/onprem
   - ../../apps/business/nextcloud/overlays/onprem
   - ../../apps/business/zammad/overlays/onprem
-  - ../../apps/education/moodle/overlays/onprem
   - ../../apps/academy/website/overlays/onprem
   - ../../apps/studio/docsgpt/overlays/onprem
