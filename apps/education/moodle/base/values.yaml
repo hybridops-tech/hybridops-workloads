@@ -90,6 +90,10 @@ metrics:
 extraEnvVars:
   - name: MOODLE_HOST
     value: learn-lms.example.invalid
+  - name: MOODLE_REVERSEPROXY
+    value: "yes"
+  - name: MOODLE_SSLPROXY
+    value: "yes"
 
 extraDeploy:
   - |
