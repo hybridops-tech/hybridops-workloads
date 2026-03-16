@@ -3,16 +3,3 @@ kind: Kustomization
 resources:
   - ../../base
   - external-secret.yaml
-configMapGenerator:
-  - name: platform-keycloak-env
-    behavior: merge
-    literals:
-      - KC_HOSTNAME=auth.hybridops.tech
-patches:
-  - target:
-      kind: Ingress
-      name: platform-keycloak
-    patch: |
-      - op: replace
-        path: /spec/rules/0/host
-        value: auth.hybridops.tech
