@@ -1,8 +1,7 @@
 # Platform Cloudflared Tunnel
 
 Purpose
-- Publish the private RKE2 Learn stack through Cloudflare Tunnel instead of exposing cluster node IPs directly.
-- Keep `auth.hybridops.tech`, `learn.hybridops.tech`, and `entitlements.hybridops.tech` on outbound-only connectivity.
+- Provides secure external access to platform services via Cloudflare Tunnel.
 
 Runtime contract
 - Namespace: `cloudflare-tunnel`

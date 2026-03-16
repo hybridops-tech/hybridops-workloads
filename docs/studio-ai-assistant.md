@@ -1,4 +1,4 @@
-# HybridOps - HyOps Copilot (Workloads)
+# HyOps Copilot (Workloads)
 
 Purpose
 - Define the workload model around HyOps Copilot and the surrounding platform services.

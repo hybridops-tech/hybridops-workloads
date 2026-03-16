@@ -1,8 +1,7 @@
 # Academy Website
 
 Purpose
-- Host the Learn portal inside the existing RKE2 cluster.
-- Serve the Astro Node SSR build from `hybridops-docs/hybridops.tech`.
+- Serves the Academy learning portal as an Astro Node.js SSR application.
 
 Runtime contract
 - Namespace: `academy`
