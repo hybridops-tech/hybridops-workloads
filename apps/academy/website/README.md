@@ -11,7 +11,7 @@ Runtime contract
 
 Required secret
 - `academy-website-secrets`
-  - projected by `ExternalSecret` from `gcp-secret-manager` in the internal on-prem target
+  - projected by `ExternalSecret` from `gcp-secret-manager` (see your cluster overlay)
   - `LEARN_SESSION_SECRET`
   - `ENTITLEMENTS_API_TOKEN`
   - `STRIPE_SECRET_KEY`
@@ -54,4 +54,5 @@ Notes
 - Keep the product/docs static surfaces outside the cluster unless you explicitly choose otherwise.
 - This app is typically composed into a Learn integration target when SSR routes and middleware are required.
 - Current overlays cover `onprem`, `edge-hetzner`, and the first stateless `burst` target.
+- The burst overlay switches the ingress class and carries a hostless fallback so a front-door proxy can reach the service without a matching `Host` header at the load balancer.
 - If you use a private runtime renderer or secret-generation flow, keep that helper outside the public workload contract.

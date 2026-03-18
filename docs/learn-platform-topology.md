@@ -63,13 +63,13 @@ Public baseline targets may include:
 - `platform/external-secrets`
 - `platform/secret-stores`
 
-## Internal boundary
+## Extension boundary
 
-HybridOps may operate additional private Academy delivery components outside the public workload baseline. Those private workloads and rollout notes must not define the public repo contract.
+Operators may extend this baseline with additional private delivery components. Those extensions must not redefine the public workload contract.
 
 ## Anti-drift rules
 
 - Do not add cluster-local databases for identity or entitlement production data.
 - Do not make Copilot access control frontend-only; backend entitlement checks remain source of truth.
 - Keep public and paid docs indexes separate for Copilot retrieval.
-- Do not let internal Academy delivery choices redefine the public workload baseline.
+- Do not let operator-specific delivery choices redefine the public workload baseline.

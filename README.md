@@ -1,6 +1,6 @@
-# Workloads
+# HybridOps Workloads
 
-Kubernetes workload catalog for GitOps deployments.
+Kubernetes workload catalog for HybridOps GitOps deployments.
 
 This repository is intended to be consumed directly by Argo CD bootstrap through
 the `hybridops-core` `argocd-bootstrap` module.
@@ -60,9 +60,7 @@ Notes:
 
 ## References
 
-- [STANDARD.md](STANDARD.md)
-- [CATALOG.md](CATALOG.md)
-- [docs/environments.md](docs/environments.md)
-- [docs/argocd-model.md](docs/argocd-model.md)
-
-For the full platform walkthrough and Argo CD onboarding guide, see the [GitOps Kubernetes foundation](https://docs.hybridops.tech/showcases/gitops-kubernetes-foundation/) showcase and the [GitOps onboarding how-to](https://docs.hybridops.tech/howto/platform/HOWTO_gitops_onboarding_argo_cd/).
+- `STANDARD.md`
+- `CATALOG.md`
+- `docs/environments.md`
+- `docs/argocd-model.md`

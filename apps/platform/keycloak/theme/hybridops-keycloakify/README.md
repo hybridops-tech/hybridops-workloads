@@ -1,4 +1,4 @@
-# Keycloakify Theme
+# HybridOps Keycloakify Theme
 
 This project builds the `hybridops` login theme jar used by the in-cluster Keycloak workload.
 

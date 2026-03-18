@@ -1,4 +1,4 @@
-# Workloads Standard
+# HybridOps Workloads Standard
 
 This repository is the public workload baseline for HybridOps.
 

@@ -1,7 +1,8 @@
 # platform/secret-stores
 
 Purpose
-- Defines cluster-level secret store resources consumed by ExternalSecret workloads.
+- Publish the cluster-level secret store definitions consumed by `ExternalSecret` resources.
+- Keep the backend choice declarative and environment-specific.
 
 Current on-prem backend
 - `ClusterSecretStore` name: `gcp-secret-manager`
