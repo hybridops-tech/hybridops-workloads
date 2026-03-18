@@ -25,6 +25,8 @@ Required secret
   - `KEYCLOAK_GOOGLE_CLIENT_SECRET` (required when Google brokering is enabled)
   - `KEYCLOAK_MICROSOFT_CLIENT_ID` (required when Microsoft brokering is enabled)
   - `KEYCLOAK_MICROSOFT_CLIENT_SECRET` (required when Microsoft brokering is enabled)
+  - `KEYCLOAK_GITHUB_CLIENT_ID` (required when GitHub brokering is enabled)
+  - `KEYCLOAK_GITHUB_CLIENT_SECRET` (required when GitHub brokering is enabled)
 
 On-prem secret source
 - Prefer an `ExternalSecret` in the cluster overlay that projects `platform-keycloak-secrets` from `gcp-secret-manager`.
