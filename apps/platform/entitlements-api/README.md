@@ -21,7 +21,7 @@ Runtime contract
 
 Required secret
 - `platform-entitlements-api-secrets`
-  - projected by `ExternalSecret` from `gcp-secret-manager` in the internal on-prem target
+  - projected by `ExternalSecret` from `gcp-secret-manager` (see your cluster overlay)
   - `DATABASE_PASSWORD`
   - `INTERNAL_API_TOKEN`
   - `STRIPE_SECRET_KEY`

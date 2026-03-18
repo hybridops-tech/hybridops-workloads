@@ -1,7 +1,8 @@
 # platform/external-secrets
 
 Purpose
-- Installs External Secrets Operator as the Kubernetes secret projection layer.
+- Install External Secrets Operator in the cluster as the steady-state Kubernetes secret projection layer.
+- Support workloads that consume external secret authorities such as GCP Secret Manager through `ExternalSecret` resources.
 
 Chosen chart
 - Repo: `https://charts.external-secrets.io`
