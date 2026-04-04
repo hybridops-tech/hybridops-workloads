@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # purpose: Fill required placeholder values for clusters/onprem-stage1 target.
-# maintainer: HybridOps.Studio
+# maintainer: HybridOps.Tech
 
 if [ -z "${BASH_VERSION:-}" ]; then
   exec bash "$0" "$@"

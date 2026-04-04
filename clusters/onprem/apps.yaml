@@ -1,13 +1,10 @@
 apps:
   - platform/external-secrets
   - platform/secret-stores
-  - platform/keycloak
-  - platform/entitlements-api
   - platform/velero
   - observability/kube-prometheus-stack
   - observability/loki
   - observability/thanos-compactor
   - business/nextcloud
   - business/zammad
-  - academy/website
   - studio/docsgpt

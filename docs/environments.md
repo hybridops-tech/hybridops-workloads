@@ -1,15 +1,15 @@
-# Targets
+# Deployment Targets
 
-Targets define Kubernetes topology and rollout maturity.
+Targets define the published deployment paths for the HybridOps workload catalog.
 
 ## Cluster targets
 
-- `onprem-smoke` (minimal smoke proof)
+- `onprem-smoke` (minimal validation target)
 - `onprem-stage1` (curated baseline)
-- `onprem` (full catalog)
-- `burst` (GKE/AKS when provisioned)
+- `onprem` (broader reusable catalog)
+- `burst` (stateless secondary-cluster baseline)
 
-Paths:
+Published paths:
 
 - `clusters/onprem-smoke`
 - `clusters/onprem-stage1`
@@ -22,5 +22,5 @@ layers and are not encoded in workload paths.
 Notes:
 
 - Edge services are deployment-specific and are not implied by this repo alone.
-- The first public burst target is intentionally stateless: `smoke/guestbook` plus `academy/website`.
+- The first public burst target is intentionally stateless: `platform/external-secrets` plus `smoke/guestbook`.
 - Remote-write, object-store, and broader platform app promotion can be layered onto burst after the target cluster contract is stable.
