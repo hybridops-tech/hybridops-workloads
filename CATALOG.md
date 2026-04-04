@@ -1,16 +1,16 @@
-# Catalog
+# Workload Catalog
 
 ## Cluster rollout targets
 
-- `clusters/onprem-smoke` (smoke proof)
-- `clusters/onprem-stage1` (guestbook + velero + loki baseline)
-- `clusters/onprem` (full on-prem app catalog)
-- `clusters/burst` (guestbook + academy website stateless burst baseline)
+- `clusters/onprem-smoke` (minimal Argo CD and cluster validation target)
+- `clusters/onprem-stage1` (curated on-prem baseline: guestbook + velero + loki)
+- `clusters/onprem` (broader reusable on-prem application catalog)
+- `clusters/burst` (stateless secondary-cluster baseline: external-secrets + guestbook)
 
 ## App catalog
 
-- platform/keycloak (draft)
-- platform/entitlements-api (draft)
+- platform/external-secrets (ready)
+- platform/secret-stores (ready)
 - platform/velero (draft)
 - platform/gitlab-runner (draft)
 - observability/kube-prometheus-stack (draft)
@@ -18,5 +18,4 @@
 - observability/thanos-compactor (draft)
 - business/nextcloud (draft)
 - business/zammad (draft)
-- academy/website (onprem and burst ready)
 - studio/docsgpt (draft)

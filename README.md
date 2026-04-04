@@ -2,10 +2,10 @@
 
 Kubernetes workload catalog for HybridOps GitOps deployments.
 
-This repository is intended to be consumed directly by Argo CD bootstrap through
+This repository is designed to be consumed directly by Argo CD bootstrap through
 the `hybridops-core` `argocd-bootstrap` module.
 
-## How end users consume this repo
+## How to consume this repository
 
 Pass a Git URL, versioned revision, and public target path.
 
@@ -30,14 +30,14 @@ Notes:
 ## Public targets
 
 - `clusters/onprem-smoke`
-  - Status: minimal smoke proof
+  - Status: minimal validation target
 - `clusters/onprem-stage1`
   - Status: curated baseline
   - Guide: `docs/onprem-stage1-rollout.md`
 - `clusters/onprem`
-  - Status: broader catalog target with additional substitutions still expected
+  - Status: broader reusable application catalog
 - `clusters/burst`
-  - Status: first stateless burst target
+  - Status: stateless secondary-cluster baseline
   - Guide: `docs/burst-rollout.md`
 
 ## Validation
@@ -54,7 +54,7 @@ Notes:
 
 - `clusters/<target>`: public enabled apps per cluster target
 - `apps/<domain>/<app>`: Argo CD Application definitions and values
-- `docs/`: public workload/operator references
+- `docs/`: public workload and operator references
 - `scripts/validate.sh`: workload hygiene checks
 - `tools/`: public helper tooling
 

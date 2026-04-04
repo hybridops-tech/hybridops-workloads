@@ -5,13 +5,13 @@ operational baseline for on-prem clusters.
 
 ## Stage targets
 
-- `clusters/onprem-smoke`: single app smoke proof (`smoke/guestbook`)
+- `clusters/onprem-smoke`: single-app validation target (`smoke/guestbook`)
 - `clusters/onprem-stage1`: first curated baseline (guestbook + velero + loki)
-- `clusters/onprem`: full catalog target (requires additional integration work)
+- `clusters/onprem`: broader catalog target
 
 ## Stage 1 app order
 
-Apply in this order to reduce blast radius:
+Apply in this order to reduce rollout risk:
 
 1. `smoke/guestbook`
 2. `platform/velero`
@@ -63,7 +63,7 @@ Use the Stage 1 helper script:
   --loki-version <LOKI_CHART_VERSION>
 ```
 
-This updates Stage 1 placeholders and runs strict target validation.
+This updates the Stage 1 placeholders and runs strict target validation.
 
 ## Validation commands
 
