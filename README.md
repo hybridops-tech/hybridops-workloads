@@ -1,5 +1,7 @@
 # HybridOps Workloads
 
+[![Workload validation](https://github.com/hybridops-tech/hybridops-workloads/actions/workflows/validate.yml/badge.svg)](https://github.com/hybridops-tech/hybridops-workloads/actions/workflows/validate.yml)
+
 Kubernetes workload catalog for HybridOps GitOps deployments.
 
 This repository is designed to be consumed directly by Argo CD bootstrap through

@@ -1,0 +1,52 @@
+# purpose: Validate public HybridOps workload targets.
+# maintainer: HybridOps.Tech
+
+name: Workload validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "37 7 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: workloads-validation-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate ${{ matrix.target }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: onprem-smoke
+            args: --strict --target onprem-smoke
+          - target: onprem-stage1
+            args: --strict --target onprem-stage1
+          - target: burst
+            args: --strict --target burst
+          - target: onprem
+            args: --target onprem
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install validation tools
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep
+
+      - name: Run workload validator
+        shell: bash
+        run: ./scripts/validate.sh ${{ matrix.args }}
