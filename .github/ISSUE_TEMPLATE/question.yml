@@ -1,0 +1,39 @@
+name: Usage question or target clarification
+description: Ask a focused question about targets, overlays, validation, or safe adoption.
+title: "[question] "
+labels:
+  - question
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this for focused questions. Do not paste kubeconfigs, tokens, private domains, or unredacted secrets.
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - onprem-smoke
+        - onprem-stage1
+        - onprem
+        - burst
+        - not target-specific
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: Ask the specific thing you need clarified.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Include the target, app, path, or command if known. Say if this is based on docs review rather than a live run.
+  - type: textarea
+    id: checked
+    attributes:
+      label: What you checked
+      description: Link the README section, rollout guide, issue, or command you already reviewed.
