@@ -1,0 +1,71 @@
+name: Workload target defect
+description: Report a reproducible problem with a workload target, app overlay, or validation path.
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include kubeconfigs, tokens, private domains, customer data, or unredacted secrets.
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      options:
+        - onprem-smoke
+        - onprem-stage1
+        - onprem
+        - burst
+        - not target-specific
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Validation script
+        - Kustomize render
+        - Argo CD sync
+        - App overlay
+        - Documentation or rollout guide
+        - Tooling
+    validations:
+      required: true
+  - type: input
+    id: reference
+    attributes:
+      label: Relevant reference
+      description: Target, app, path, command, or revision involved.
+      placeholder: clusters/onprem-stage1, apps/platform/velero, scripts/validate.sh
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behaviour
+    validations:
+      required: true
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed behaviour
+      description: Include the exact error or result, with sensitive data removed.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Run ./scripts/validate.sh --target ...
+        2. Render ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include OS, Kubernetes version if relevant, Kustomize version if relevant, and whether this was render-only or cluster-side.
